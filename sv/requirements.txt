@@ -1,0 +1,16 @@
+gunicorn==19.9.0
+gevent==1.4.0
+django==2.1.5
+djangorestframework==3.9.1
+djangorestframework-xml==1.4.0
+django-redis==4.10.0
+mysqlclient==1.4.1
+channels==2.1.6
+channels_redis==2.3.3
+Pillow==5.4.1
+
+requests==2.21.0
+paramiko==2.4.2
+qrcode==6.1
+qrtools==0.0.2
+lxml==4.3.0

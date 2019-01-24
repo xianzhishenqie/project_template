@@ -1,0 +1,7 @@
+/.idea/
+/static/
+media/*
+*.pyc
+log/
+*/migrations/
+*.mo
