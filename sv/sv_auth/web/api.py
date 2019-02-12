@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from sv_base.utils.common.utext import rk
 from sv_base.utils.rest.mixins import CacheModelMixin, BatchSetModelMixin, DestroyModelMixin, SVMixin
 
-# from sv_remote.utils.guacamole import GuacamoleDatabase
 from sv_auth.models import Organization, User
 from sv_auth.utils import org as org_util
 from sv_auth.utils.rest.decorators import org_queryset
@@ -119,7 +118,6 @@ class UserViewSet(BatchSetModelMixin, DestroyModelMixin, CacheModelMixin, SVMixi
             instance.username = random_key
             instance.email = random_key
             instance.save()
-            GuacamoleDatabase.remove_user(instance.pk)
             deleted_users.append(instance)
         if deleted_users:
             return True
