@@ -1,7 +1,11 @@
+from channels.layers import get_channel_layer
 
 from sv_base.utils.websocket import Websocket
 
 from sv_auth.models import User
+
+
+channel_layer = get_channel_layer()
 
 
 class UserWebsocket(Websocket):
@@ -25,14 +29,14 @@ class UserWebsocket(Websocket):
         return 'user-{user_id}'.format(user_id=user_id)
 
     @classmethod
-    def user_send(cls, user, content, close=False, code=None):
+    def user_send(cls, user, content):
         if isinstance(user, (list, tuple, set)):
             users = user
         else:
             users = [user]
 
         for usr in users:
-            cls.group_send(cls.user_group_name(usr), content, close=close, code=code)
+            channel_layer.group_send(cls.user_group_name(usr), content)
 
     def check_auth(self):
         if self.enable_auth and not self.user.is_authenticated:
