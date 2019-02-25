@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 from sv_base.utils.common.uenum import Enum
-from sv_base.utils.models.manager import MManager
+from sv_base.utils.db.manager import MManager
 from sv_base.utils.resource.models import ResourceModel
 
 

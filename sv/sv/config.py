@@ -3,6 +3,7 @@ DEBUG = True
 
 SERVER = 'http://www.shixiaobo.com'
 
+# app名称 url路径
 SV_APP_PATHS = [
     ('sv_base', ''),
     'sv_auth',
@@ -24,6 +25,7 @@ DATABASES = {
 }
 
 
+# app配置
 APP_SETTINGS = {
 
 }

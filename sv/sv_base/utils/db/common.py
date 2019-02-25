@@ -1,6 +1,12 @@
 import os
 
 from django.conf import settings
+from django.db import connections
+
+
+def close_old_connections():
+    for conn in connections.all():
+        conn.close_if_unusable_or_obsolete()
 
 
 def get_obj(pk_or_obj, model):

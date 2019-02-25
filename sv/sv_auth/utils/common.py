@@ -1,5 +1,5 @@
 
-from sv_base.utils.models.common import get_obj
+from sv_base.utils.db.common import get_obj
 from sv_auth.models import User
 
 
