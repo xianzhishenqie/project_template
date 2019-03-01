@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
 from channels.generic.websocket import JsonWebsocketConsumer
 
 
 class Websocket(JsonWebsocketConsumer):
-
+    """
+    websocket类, 添加自动组管理
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.groups is None:

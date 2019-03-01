@@ -1,5 +1,14 @@
+from typing import Optional, List
 
-def diff(dict1, dict2, fields=None):
+
+def diff(dict1: dict, dict2: dict, fields: Optional[List[str]] = None) -> dict:
+    """获取字典差异字段。
+
+    :param dict1: 字典1
+    :param dict2: 字典2
+    :param fields: 比较字段列表
+    :return: 差异字典
+    """
     fields = fields or dict2.keys()
     ret = {}
     for field in fields:
@@ -8,14 +17,26 @@ def diff(dict1, dict2, fields=None):
     return ret
 
 
-def need_field(field, fields=None):
+def need_field(field: str, fields: Optional[List[str]] = None) -> bool:
+    """是否需要比较字段
+
+    :param field: 字段
+    :param fields: 需要的字段列表
+    :return: bool
+    """
     if fields is None or field in fields:
         return True
 
     return False
 
 
-def filter_data(dict_data, fields=None):
+def filter_data(dict_data: dict, fields: Optional[List[str]] = None) -> dict:
+    """过滤字典
+
+    :param dict_data: 字典
+    :param fields: 需要的字段列表
+    :return: 过滤字典
+    """
     if fields is not None:
         exclude_fields = set(dict_data.keys()) - set(fields)
         for field in exclude_fields:

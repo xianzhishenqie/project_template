@@ -6,6 +6,9 @@ from sv_base.utils.common.utext import md5
 
 
 class CacheProduct:
+    """
+    memcached引擎缓存类
+    """
     def __new__(cls, name):
         # 创建一个新的缓存实例
         cache_instance = _create_cache('default')

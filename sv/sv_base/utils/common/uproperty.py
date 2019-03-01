@@ -2,7 +2,12 @@ import functools
 import types
 
 
-def cached_property(func):
+def cached_property(func: function) -> property:
+    """类的缓存属性装饰器
+
+    :param func: 类的属性获取方法
+    :return: 类的缓存属性
+    """
     name = func.__name__
     _name = '_{}'.format(name)
 
@@ -27,22 +32,43 @@ def cached_property(func):
     return property(fget=fget, fset=fset, fdel=fdel)
 
 
-def add_cached_property(instance, name):
-    if not hasattr(instance, '_cached_propertys'):
-        instance._cached_propertys = set()
+instance_cached_properties_name = '_cached_properties'
 
-    instance._cached_propertys.add(name)
-
-    if not hasattr(instance, 'reset_cached_propertys'):
-        instance.reset_cached_propertys = types.MethodType(reset_cached_propertys, instance)
+instance_reset_cached_properties_name = 'reset_cached_properties'
 
 
-def remove_cached_property(instance, name):
-    if hasattr(instance, '_cached_propertys'):
-        instance._cached_propertys.remove(name)
+def add_cached_property(instance: object, name: str) -> None:
+    """添加缓存的属性
+
+    :param instance: 实例对象
+    :param name: 缓存的属性名称
+    """
+    if not hasattr(instance, instance_cached_properties_name):
+        setattr(instance, instance_cached_properties_name, set())
+
+    getattr(instance, instance_cached_properties_name).add(name)
+
+    if not hasattr(instance, instance_reset_cached_properties_name):
+        setattr(instance, instance_reset_cached_properties_name, types.MethodType(reset_cached_properties, instance))
 
 
-def reset_cached_propertys(instance):
-    if hasattr(instance, '_cached_propertys'):
-        for property_name in list(instance._cached_propertys):
+def remove_cached_property(instance: object, name: str) -> None:
+    """移除缓存的属性
+
+    :param instance: 实例对象
+    :param name: 缓存的属性名称
+    """
+    cached_properties = getattr(instance, instance_cached_properties_name, None)
+    if cached_properties:
+        cached_properties.remove(name)
+
+
+def reset_cached_properties(instance: object) -> None:
+    """移除所有缓存的属性
+
+    :param instance: 实例对象
+    """
+    cached_properties = getattr(instance, instance_cached_properties_name, None)
+    if cached_properties:
+        for property_name in list(cached_properties):
             delattr(instance, property_name)
