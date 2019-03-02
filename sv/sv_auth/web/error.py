@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-from sv_base.utils.error import Error
+from enum import Enum
+from sv_base.utils.error import ErrorMeta
 from sv_base.utils.common.utext import trans as _
 
 
-error = Error(
-    AUTHENTICATION_FAILED=_('用户名或密码错误')
-)
+class Error(Enum, metaclass=ErrorMeta):
+    AUTHENTICATION_FAILED = _('用户名或密码错误')

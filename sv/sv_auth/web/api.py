@@ -16,7 +16,7 @@ from sv_auth.utils.rest.permissions import IsAdminOrReadOnly
 
 
 from . import serializers as mserializers
-from .error import error
+from .error import Error
 
 
 class SessionViewSet(SVMixin, viewsets.ViewSet):
@@ -28,7 +28,7 @@ class SessionViewSet(SVMixin, viewsets.ViewSet):
         password = self.shift_data.get('password')
         user = authenticate(username=username, password=password)
         if not user:
-            raise exceptions.AuthenticationFailed(error.AUTHENTICATION_FAILED)
+            raise exceptions.AuthenticationFailed(Error.AUTHENTICATION_FAILED)
         login(request, user)
         return Response(status=status.HTTP_200_OK)
 
@@ -46,19 +46,19 @@ class OrganizationViewSet(CacheModelMixin, SVMixin, viewsets.ModelViewSet):
     def sub_perform_create(self, serializer):
         validated_data = serializer.validated_data
         if not org_util.can_add_org(self.request.user, validated_data.get('parent')):
-            raise exceptions.PermissionDenied(error.NO_PERMISSION)
+            raise exceptions.PermissionDenied(Error.NO_PERMISSION)
 
         return super(OrganizationViewSet, self).sub_perform_create(serializer)
 
     def sub_perform_update(self, serializer):
         if not org_util.can_operate_org(self.request.user, serializer.instance):
-            raise exceptions.PermissionDenied(error.NO_PERMISSION)
+            raise exceptions.PermissionDenied(Error.NO_PERMISSION)
 
         return super(OrganizationViewSet, self).sub_perform_update(serializer)
 
     def sub_perform_destroy(self, instance):
         if not org_util.can_operate_org(self.request.user, instance):
-            raise exceptions.PermissionDenied(error.NO_PERMISSION)
+            raise exceptions.PermissionDenied(Error.NO_PERMISSION)
 
         return super(OrganizationViewSet, self).sub_perform_destroy(instance)
 
@@ -84,7 +84,7 @@ class UserViewSet(BatchSetModelMixin, DestroyModelMixin, CacheModelMixin, SVMixi
         if organization is not None:
             queryset = queryset.filter(organization=organization)
 
-        group = self.query_data.getlist('group', User.Group.values())
+        group = self.query_data.getlist('group', User.Group.__members__.values())
         if group:
             queryset = queryset.filter(groups=group)
 
@@ -93,13 +93,13 @@ class UserViewSet(BatchSetModelMixin, DestroyModelMixin, CacheModelMixin, SVMixi
     def sub_perform_create(self, serializer):
         validated_data = serializer.validated_data
         if not org_util.can_add_user(self.request.user, validated_data.get('organization'), validated_data.get('groups')):
-            raise exceptions.PermissionDenied(error.NO_PERMISSION)
+            raise exceptions.PermissionDenied(Error.NO_PERMISSION)
 
         return super(UserViewSet, self).sub_perform_create(serializer)
 
     def sub_perform_update(self, serializer):
         if not org_util.can_operate_user(self.request.user, serializer.instance):
-            raise exceptions.PermissionDenied(error.NO_PERMISSION)
+            raise exceptions.PermissionDenied(Error.NO_PERMISSION)
 
         return super(UserViewSet, self).sub_perform_update(serializer)
 

@@ -2,13 +2,13 @@ import pickle
 import sched
 import threading
 import time
-from typing import Optional
+from typing import Callable, Optional
 
 from django.core.cache import cache
 from sv_base.utils.common.utext import md5
 
 
-def async_exe(func: function, args: tuple = None, kwargs: dict = None, delay: int = 0) -> threading.Thread:
+def async_exe(func: Callable, args: tuple = None, kwargs: dict = None, delay: int = 0) -> threading.Thread:
     """异步执行方法
 
     :param func: 待执行方法
@@ -29,7 +29,7 @@ def async_exe(func: function, args: tuple = None, kwargs: dict = None, delay: in
     return thread
 
 
-def async_exe_once(func: function, args: tuple = None, kwargs: dict = None, delay: int = 0, timeout: int = 3) -> Optional[threading.Thread]:
+def async_exe_once(func: Callable, args: tuple = None, kwargs: dict = None, delay: int = 0, timeout: int = 3) -> Optional[threading.Thread]:
     """异步执行一次方法
 
     :param func: 待执行方法
@@ -48,7 +48,7 @@ def async_exe_once(func: function, args: tuple = None, kwargs: dict = None, dela
     return async_exe(func, args, kwargs, delay)
 
 
-def _exe_key(func: function, args: tuple, kwargs: dict) -> str:
+def _exe_key(func: Callable, args: tuple, kwargs: dict) -> str:
     """方法识别key
 
     :param func: 待执行方法

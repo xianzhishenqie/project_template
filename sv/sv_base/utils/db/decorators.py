@@ -1,10 +1,11 @@
 
 import functools
+from typing import Callable
 
 from .common import close_old_connections
 
 
-def promise_db_connection(func: function) -> function:
+def promise_db_connection(func: Callable) -> Callable:
     """确保有效的数据库连接装饰器
 
     :param func: 涉及数据库操作的执行方法

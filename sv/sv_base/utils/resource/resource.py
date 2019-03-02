@@ -272,7 +272,7 @@ class DataResource:
         if not self.option.has_related:
             return
 
-        for related_type in RelationType.values():
+        for related_type in RelationType.__members__.values():
             for field_name, field_option in getattr(self.option, related_type).items():
                 if field_option.rely_on != rely_on or not field_option.set:
                     continue

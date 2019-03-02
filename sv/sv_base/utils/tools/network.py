@@ -1,39 +1,58 @@
-# -*- coding: utf-8 -*-
 import logging
 import socket
 import subprocess
 import time
 import re
 
+from typing import Callable, Optional
+
 
 logger = logging.getLogger(__name__)
 
 
-def cport(ip, port, timeout=2):
-    sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sk.settimeout(timeout)
-    try:
-        sk.connect((ip, port))
-    except Exception:
-        result = False
-    else:
-        result = True
+def cport(ip: str, port: int, timeout: int = 2) -> bool:
+    """检查端口是否连通
 
-    sk.close()
+    :param ip: ip地址
+    :param port: 进程端口
+    :param timeout: 超时时间
+    :return: 是否连通
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sk:
+        sk.settimeout(timeout)
+        try:
+            sk.connect((ip, port))
+        except Exception:
+            result = False
+        else:
+            result = True
     return result
 
 
-def ping(ip, timeout=2, count=2):
+def ping(ip: str, timeout: int = 2, count: int = 2) -> bool:
+    """检查ip是否ping通
+
+    :param ip: ip地址
+    :param timeout: 超时时间
+    :param count: 尝试次数
+    :return: 是否ping通
+    """
     try:
         res = subprocess.check_output('ping -c %s -w %s %s' % (count, timeout, ip), shell=True)
     except:
         return False
     if res.find('icmp_'):
         return True
-    return False
+    else:
+        return False
 
 
-def get_ping(ip):
+def get_ping(ip: str) -> int:
+    """获取ip延迟时间
+
+    :param ip: ip地址
+    :return: 延迟时间 ms
+    """
     try:
         p = subprocess.getoutput("ping -c 1 {}".format(ip))
         pattern = re.compile(r"rtt min/avg/max/mdev = .*/(.*?)/.*/0.000 ms")
@@ -43,8 +62,30 @@ def get_ping(ip):
     return delay
 
 
-# 结合check_port和ping
-def probe(ip, port=None, timeout=2, step_time=2, limit_time=300, stop_check_len=5, stop_check=None, callback=None, timeout_callback=None, log_prefix='probe'):
+def probe(ip: str,
+          port: Optional[int] = None,
+          timeout: int = 2,
+          step_time: int = 2,
+          limit_time: int = 300,
+          stop_check_len: int = 5,
+          stop_check: Optional[Callable] = None,
+          callback: Optional[Callable] = None,
+          timeout_callback: Optional[Callable] = None,
+          log_prefix: str = 'probe') -> None:
+    """探测地址连通状况
+
+    :param ip: ip地址
+    :param port: 进程端口
+    :param timeout: 超时时间
+    :param step_time: 探测间隔时间
+    :param limit_time:
+    :param stop_check_len:
+    :param stop_check:
+    :param callback:
+    :param timeout_callback:
+    :param log_prefix:
+    :return:
+    """
     # 找不到端口则ping检查
     if port:
         checker = cport
@@ -59,8 +100,7 @@ def probe(ip, port=None, timeout=2, step_time=2, limit_time=300, stop_check_len=
         logger.error('[%s] %s check %s: no ip' % (log_prefix, checker.__name__, dst_info))
         return
 
-    if stop_check:
-        stop_check_time = 0
+    stop_check_time = 0
     all_time = 0
 
     while True:

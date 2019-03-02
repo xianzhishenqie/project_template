@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Union, Type
 
 from django.conf import settings
 from django.db import connections
@@ -14,7 +14,7 @@ def close_old_connections() -> None:
         conn.close_if_unusable_or_obsolete()
 
 
-def get_obj(pk_or_obj: Optional[str, int, Model], model: Model) -> Optional[Model]:
+def get_obj(pk_or_obj: Union[str, int, Model, None], model: Type[Model]) -> Optional[Model]:
     """根据主键或对象本身获取model对象
 
     :param pk_or_obj: 主键或对象本身

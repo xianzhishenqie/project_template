@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+from enum import IntEnum
+
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils import timezone
 
-from sv_base.utils.common.uenum import Enum
 from sv_base.utils.db.manager import MManager
 from sv_base.utils.resource.models import ResourceModel
 
@@ -24,14 +24,12 @@ class User(ResourceModel, AbstractUser):
     name = models.CharField(max_length=100, default='')
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, default=None)
 
-    Group = Enum(
-        ADMIN=1,
-        NORMAL=2,
-    )
-    Status = Enum(
-        DELETE=0,
-        NORMAL=1,
-    )
+    class Group(IntEnum):
+        ADMIN = 1
+        NORMAL = 2
+    class Status(IntEnum):
+        DELETE = 0
+        NORMAL = 1
     status = models.PositiveIntegerField(default=Status.NORMAL)
     extra = models.TextField(default='')
 
@@ -64,11 +62,10 @@ class User(ResourceModel, AbstractUser):
 class Owner(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='+')
 
-    PublicMode = Enum(
-        PRIVATE=0,
-        INNER=1,
-        OUTER=2,
-    )
+    class PublicMode(IntEnum):
+        PRIVATE = 0
+        INNER = 1
+        OUTER = 2
     public_mode = models.PositiveIntegerField(default=PublicMode.PRIVATE)
     public_operate = models.BooleanField(default=False)
 

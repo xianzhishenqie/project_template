@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
+from enum import IntEnum, Enum
+
 from django.db import models
 from django.db.models import Model, QuerySet
 from django.utils.module_loading import import_string
 from django.utils import six
-
-from sv_base.utils.common.uenum import Enum
 
 from .exception import ResourceException
 
@@ -27,19 +26,17 @@ file_fields = (
 
 
 # 解决冲突方案 0抛异常 1替换为冲突对象 2覆盖冲突对象 3忽略冲突
-ResolveConflictType = Enum(
-    RAISE=0,
-    REPLACE=1,
-    COVER=2,
-    IGNORE=3,
-)
+class ResolveConflictType(IntEnum):
+    RAISE = 0
+    REPLACE = 1
+    COVER = 2
+    IGNORE = 3
 
 
-RelationType = Enum(
-    TO_CUSTOM='to_custom',
-    TO_ONE='to_one',
-    TO_MANY='to_many',
-)
+class RelationType(str, Enum):
+    TO_CUSTOM = 'to_custom'
+    TO_ONE = 'to_one'
+    TO_MANY = 'to_many'
 
 
 class FieldOption:
@@ -122,7 +119,7 @@ class DataOption:
 
         # 字段选项 key资源字段名称 value获取/设置该资源的方法
         self.field_options = {}
-        for relation_type in RelationType.values():
+        for relation_type in RelationType.__members__.values():
             field_options = {}
             if relation_type in options:
                 for field_name, field_option in options[relation_type].items():

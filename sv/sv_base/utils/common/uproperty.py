@@ -1,8 +1,9 @@
 import functools
 import types
+from typing import Callable
 
 
-def cached_property(func: function) -> property:
+def cached_property(func: Callable) -> property:
     """类的缓存属性装饰器
 
     :param func: 类的属性获取方法

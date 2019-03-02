@@ -5,7 +5,7 @@ import os
 import re
 import uuid
 
-from typing import Optional
+from typing import Union
 
 from django.conf import settings
 from django.utils.encoding import force_text
@@ -98,7 +98,7 @@ class Trans(Txt):
     # 格式化参数
     p = None
 
-    def __new__(cls, s: str, code: Optional[int, str] = None) -> object:
+    def __new__(cls, s: str, code: Union[int, str, None] = None) -> object:
         """生成初始化实例对象
 
         :param s: 国际化字符串

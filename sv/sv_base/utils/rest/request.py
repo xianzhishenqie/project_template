@@ -1,6 +1,6 @@
 from django.http import QueryDict
 from django.utils import six
-from sv_base.utils.common.ulist import listfilter, valuefilter
+from sv_base.utils.common.ulist import list_filter, value_filter
 
 
 class DataFilter:
@@ -17,7 +17,7 @@ class DataFilter:
                 return data
             else:
                 data = handle_bool_value(data)
-        return valuefilter(data, filter_param, strict=self.strict)
+        return value_filter(data, filter_param, strict=self.strict)
 
     def getlist(self, field_name, filter_param=str):
         data = self.data.getlist(field_name) if self._is_query_dict else self.data.get(field_name)
@@ -25,7 +25,7 @@ class DataFilter:
             data = [data]
         if filter_param is bool:
             data = [handle_bool_value(item) for item in data]
-        return listfilter(data, filter_param, strict=self.strict) if data else []
+        return list_filter(data, filter_param, strict=self.strict) if data else []
 
 
 class RequestData:

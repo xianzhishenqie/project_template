@@ -1,63 +1,64 @@
-import copy
+from __future__ import annotations
+
 import enum
 
-from django.utils import six
 from rest_framework.exceptions import ErrorDetail
 
 from sv_base.utils.common.utext import Txt, trans as _
 
 
-class CommonError(enum.Enum):
-    ERROR = _('服务器繁忙')
-
-    NO_PERMISSION = _('无操作权限')
-
-    INVALID_PARAMS = _('无效的参数')
-
-    INVALID_VALUE = _('参数值无效')
-
-    DUPLICATE_SUBMIT = _('重复的提交')
-
-    DUPLICATE_REQUEST = _('重读的请求')
-
-    SAVE_FAILED = _('数据保存失败')
+default_errors = dict(
+    ERROR=_('服务器繁忙'),
+    NO_PERMISSION=_('无操作权限'),
+    INVALID_PARAMS=_('无效的参数'),
+    INVALID_VALUE=_('参数值无效'),
+    DUPLICATE_SUBMIT=_('重复的提交'),
+    DUPLICATE_REQUEST=_('重复的请求'),
+    SAVE_FAILED=_('数据保存失败'),
+)
 
 
-class Error:
+def generate_error_code(attr_name: str) -> str:
+    """生成错误码。
+
+    :param attr_name: 属性名称
+    :return: 错误码
     """
-    定义错误类 错误码->错误描述
-    """
-    error = Enum()
+    return attr_name
 
-    def __new__(cls, **errors) -> Enum:
-        """初始化错误字典
 
-        :param errors: 定义错误的字典
-        :return: 错误枚举
+for key, value in default_errors.items():
+    value.code = generate_error_code(key)
+
+
+class ErrorMeta(enum.EnumMeta):
+    def __new__(metacls, cls: str, bases: tuple, classdict: enum._EnumDict) -> ErrorMeta:
+        """初始化格式错误字典
+
+        :param cls: 当前类名
+        :param bases: 父类
+        :param classdict: 类属性
+        :return: 当前类
         """
-        custom_errors = copy.copy(common_error.source)
-        for attr_name, error_desc in errors.items():
-            error_code = cls.generate_error_code(attr_name)
-            if isinstance(error_desc, Txt):
-                error_desc.code = error_code
-                detail = error_desc
-            elif isinstance(error_desc, six.string_types):
-                detail = ErrorDetail(error_desc, error_code)
-            else:
-                error_desc.code = error_code
-                detail = error_desc
-            custom_errors[attr_name] = detail
-        cls.error.update(**custom_errors)
-        return Enum(**custom_errors)
+        errors = []
+        for attr_name, error_desc in list(classdict.items()):
+            if attr_name.isupper():
+                error_code = generate_error_code(attr_name)
+                if isinstance(error_desc, Txt):
+                    error_desc.code = error_code
+                    detail = error_desc
+                elif isinstance(error_desc, str):
+                    detail = ErrorDetail(error_desc, error_code)
+                else:
+                    error_desc.code = error_code
+                    detail = error_desc
 
-    @classmethod
-    def generate_error_code(cls, attr_name: str) -> str:
-        """生成错误码。
+                errors.append((attr_name, detail))
+                classdict._member_names.remove(attr_name)
+                classdict._last_values.remove(error_desc)
+                classdict.pop(attr_name)
 
-        :param attr_name: 属性名称
-        :return: 错误码
-        """
-        return attr_name
+        for attr_name, detail in list(default_errors.items()) + errors:
+            classdict[attr_name] = detail
 
-
-error = Error.error
+        return enum.EnumMeta.__new__(metacls, cls, bases, classdict)

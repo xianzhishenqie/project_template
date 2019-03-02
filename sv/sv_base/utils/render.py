@@ -1,6 +1,6 @@
 import copy
 
-from typing import Optional
+from typing import Callable, Optional
 
 from django.http.request import HttpRequest
 from django.shortcuts import render
@@ -44,7 +44,7 @@ class AppRender:
         return render(request, template_name, context, content_type, status, using)
 
 
-def get_app_render(module: str, template_path: Optional[str] = None) -> function:
+def get_app_render(module: str, template_path: Optional[str] = None) -> Callable:
     """获取app对应的渲染方法
 
     :param module: 模块名称
