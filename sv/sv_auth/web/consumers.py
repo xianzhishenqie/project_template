@@ -1,7 +1,6 @@
 from channels.layers import get_channel_layer
 
 from sv_base.utils.websocket import Websocket
-
 from sv_auth.models import User
 
 
@@ -13,7 +12,7 @@ class UserWebsocket(Websocket):
     enable_auth = False
 
     @property
-    def user(self):
+    def user(self) -> User:
         return self.scope['user']
 
     def get_groups(self):

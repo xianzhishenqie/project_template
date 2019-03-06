@@ -1,3 +1,9 @@
+"""
+rest framwork补丁
+
+"""
+from typing import Union
+
 from django.utils.encoding import force_text
 
 from rest_framework import exceptions
@@ -8,10 +14,12 @@ from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 from sv_base.utils.common.utext import Trans
 
 
-def _get_error_details(data, default_code=None):
-    """
-    Descend into a nested data structure, forcing any
-    lazy translation strings or strings into `ErrorDetail`.
+def _get_error_details(data: object, default_code: Union[int, str, None] = None) -> object:
+    """加载错误详情
+
+    :param data: 错误对象
+    :param default_code: 默认错误码
+    :return: 错误对象
     """
     if isinstance(data, list):
         ret = [
@@ -37,6 +45,11 @@ def _get_error_details(data, default_code=None):
 
 
 def _get_full_details(detail):
+    """解析获取详细的错误信息
+
+    :param detail: 错误信息
+    :return: 详细的错误信息
+    """
     if isinstance(detail, list):
         return [_get_full_details(item) for item in detail]
     elif isinstance(detail, dict):
@@ -49,6 +62,12 @@ def _get_full_details(detail):
 
 
 def file_field_to_representation(self, value):
+    """格式化文件字段返回值
+
+    :param self: 文件字段对象
+    :param value: 文件对象
+    :return: 返回值
+    """
     if not value:
         return None
 
@@ -62,7 +81,10 @@ def file_field_to_representation(self, value):
     return value.name
 
 
-def monkey_patch():
+def monkey_patch() -> None:
+    """打补丁
+
+    """
     exceptions._get_error_details = _get_error_details
     exceptions._get_full_details = _get_full_details
     FileField.to_representation = file_field_to_representation

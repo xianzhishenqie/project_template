@@ -8,7 +8,9 @@ from sv_auth.utils.owner import filter_operate_queryset
 
 
 class BatchSetOwnerModelMixin(BatchSetModelMixin):
-
+    """
+    批量更新资源字段
+    """
     batch_set_fields = {
         'public_mode': Owner.PublicMode.__members__.values()
     }

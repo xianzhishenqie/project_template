@@ -1,10 +1,16 @@
 
 import functools
+from typing import Callable
 
 from sv_base.utils.rest.request import RequestData
 
 
-def api_request_data(strict=False):
+def api_request_data(strict: bool = False) -> Callable:
+    """添加自定义的请求参数对象
+
+    :param strict: 严格过滤模式
+    :return: 请求处理方法
+    """
     def wrapper(func):
         @functools.wraps(func)
         def _wrapper(view, request, *args, **kwargs):
@@ -15,7 +21,12 @@ def api_request_data(strict=False):
     return wrapper
 
 
-def request_data(strict=False):
+def request_data(strict: bool = False) -> Callable:
+    """添加自定义的请求参数对象
+
+    :param strict: 严格过滤模式
+    :return: 请求处理方法
+    """
     def wrapper(func):
         @functools.wraps(func)
         def _wrapper(request, *args, **kwargs):

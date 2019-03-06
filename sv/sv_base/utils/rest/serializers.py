@@ -3,11 +3,11 @@ from rest_framework import serializers
 
 class ModelSerializer(serializers.ModelSerializer):
     """
-    A ModelSerializer that takes an additional `fields` argument that
-    controls which fields should be displayed.
+    序列化类，可根据传入fields自动序列化对应字段
+
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         # Don't pass the 'fields' arg up to the superclass
         fields = kwargs.pop('fields', None)
 
