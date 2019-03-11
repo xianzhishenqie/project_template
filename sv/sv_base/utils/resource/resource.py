@@ -1,11 +1,14 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+import copy
 import pickle
 import logging
 import os
 import shutil
-import copy
+from typing import Type
 
 from django.conf import settings
+from django.db.models import Model, Field
 
 from sv_base.utils.common.utext import md5
 from .exception import ResourceException
@@ -18,8 +21,10 @@ logger = logging.getLogger(__name__)
 index_key = '_index'
 
 
-# 从对象生成资源, 序列化导出数据 不需冲突检查
 class ModelResource:
+    """
+    从对象生成资源, 序列化导出数据 不需冲突检查
+    """
     # 资源汇总池
     resource_pool = {}
     # 资源表对应的所有资源
@@ -27,7 +32,13 @@ class ModelResource:
     p_key_pool = {}
     p_key_counter = 1
 
-    def __new__(cls, obj, root_model):
+    def __new__(cls, obj: Model, root_model: Type[Model]) -> ModelResource:
+        """生成对象资源实例
+
+        :param obj: 数据对象
+        :param root_model: 根资源表
+        :return: 对象资源实例
+        """
         # 序列化数据对象模型类
         p_model = pickle.dumps(obj._meta.model)
         # 根据模型类和主键生成资源唯一标识
@@ -55,12 +66,21 @@ class ModelResource:
     # 重置类的资源池
     @classmethod
     def reset(cls):
+        """重置类的资源池
+
+        """
         cls.resource_pool = {}
         cls.model_resources = {}
         cls.p_key_pool = {}
         cls.p_key_counter = 1
 
-    def __init__(self, obj, root_model):
+    def __init__(self, obj: Model, root_model: Type[Model]) -> None:
+        """初始化对象资源实例，实现需要防止对象重复初始化
+
+        :param obj: 数据对象
+        :param root_model: 根资源表
+        """
+
         if self._inited:
             return
 
@@ -86,8 +106,10 @@ class ModelResource:
         # 标识资源已初始化
         self._inited = True
 
-    # 序列化资源
-    def dumps(self):
+    def dumps(self) -> None:
+        """序列化资源
+
+        """
         # 只序列化一次资源
         if self._dumped:
             return
@@ -105,7 +127,11 @@ class ModelResource:
         # 标识资源已序列化
         self._dumped = True
 
-    def get_relation_index(self):
+    def get_relation_index(self) -> dict:
+        """获取关联数据索引
+
+        :return: 关联数据索引
+        """
         relation_index = {}
         for field_name, related_resrc in self.related_resource.items():
             if isinstance(related_resrc, list):
@@ -114,8 +140,12 @@ class ModelResource:
                 relation_index[field_name] = related_resrc.p_key if related_resrc else None
         return relation_index
 
-    # 字段序列化
-    def get_field_serializable_value(self, field):
+    def get_field_serializable_value(self, field: Field) -> object:
+        """字段序列化
+
+        :param field: 字段
+        :return: 序列化值
+        """
         obj = self.obj
         # 强置的字段直接设为强置值
         if field.attname in self.option.force:
@@ -134,12 +164,16 @@ class ModelResource:
             value = obj.serializable_value(field.attname)
         return value
 
-    # 递归解析资源的关联树
-    def parse_related_tree(self):
+    def parse_related_tree(self) -> None:
+        """递归解析资源的关联树
+
+        """
         self._parse_related_tree(self)
 
-    # 获取关联资源
-    def get_related_resources(self):
+    def get_related_resources(self) -> None:
+        """获取关联资源
+
+        """
         if not self.option.has_related:
             return
 
@@ -159,9 +193,13 @@ class ModelResource:
                 if sub_resource and sub_resource not in self.related_resources:
                     self.related_resources.append(sub_resource)
 
-    # 复制资源关联的文件
     @classmethod
-    def copy_files(cls, tmp_dir, copying_files):
+    def copy_files(cls, tmp_dir: str, copying_files: dict) -> None:
+        """复制资源关联的文件
+
+        :param tmp_dir: 目标临时目录
+        :param copying_files: 文件对应列表
+        """
         tmp_media_dir = os.path.join(tmp_dir, 'media')
 
         for dst_file_name, src_file_path in copying_files.items():
@@ -176,9 +214,12 @@ class ModelResource:
                 logger.error('copy file [%s] to [%s] error: %s', src_file_path, tmp_path, e)
                 continue
 
-    # 递归解析资源的关联树
     @classmethod
-    def _parse_related_tree(cls, resource):
+    def _parse_related_tree(cls, resource: ModelResource) -> None:
+        """递归解析资源的关联树
+
+        :param resource: 对象资源实例
+        """
         if not resource or resource._parsed or not resource.option.has_related:
             return
 
@@ -189,14 +230,23 @@ class ModelResource:
             cls._parse_related_tree(related_resource)
 
 
-# 从资源生成对象, 反序列化导入数据 需要冲突检查
 class DataResource:
+    """从资源生成对象, 反序列化导入数据 需要冲突检查
+
+    """
+
     resource_pool = {}
     model_resources = {}
     resource_index_pool = {}
     resource_data_pool = {}
 
-    def __new__(cls, data, root_model):
+    def __new__(cls, data: dict, root_model: Type[Model]) -> DataResource:
+        """生成序列化数据实例
+
+        :param data: 序列化数据
+        :param root_model: 根资源模型
+        :return: 序列化数据实例
+        """
         index = data[index_key]
         p_key = index['key']
         # 资源池已有资源直接返回不再新建
@@ -215,7 +265,12 @@ class DataResource:
             resource._inited = False
         return resource
 
-    def __init__(self, data, root_model):
+    def __init__(self, data: dict, root_model: Type[Model]) -> None:
+        """初始化序列化数据实例，实现需要防止对象重复初始化
+
+        :param data: 序列化数据
+        :param root_model: 根资源模型
+        """
         if self._inited:
             return
 
@@ -247,28 +302,44 @@ class DataResource:
 
         self._inited = True
 
-    # 重置资源池
     @classmethod
-    def reset(cls, resource_index_pool, resource_data_pool):
+    def reset(cls, resource_index_pool: dict, resource_data_pool: dict) -> None:
+        """重置资源池
+
+        :param resource_index_pool: 数据索引集合
+        :param resource_data_pool: 数据集合
+        """
         cls.resource_pool = {}
         cls.model_resources = {}
         cls.resource_index_pool = resource_index_pool
         cls.resource_data_pool = resource_data_pool
 
     @classmethod
-    def parse_model(cls, data):
+    def parse_model(cls, data: dict) -> Type[Model]:
+        """解析数据表模型
+
+        :param data: 数据
+        :return: 数据表模型
+        """
         index = data[index_key]
         p_model = index['model']
         return pickle.loads(str(p_model))
 
-    def load_data(self):
+    def load_data(self) -> None:
+        """载入数据，转换问数据实例
+
+        """
         data = self.data
         obj = self.model()
         for field in self.option.data_fields:
             setattr(obj, field.attname, data[field.attname])
         self.obj = obj
 
-    def load_related(self, rely_on=True):
+    def load_related(self, rely_on: bool = True) -> None:
+        """载入关联数据
+
+        :param rely_on: 过滤是否是依赖的数据
+        """
         if not self.option.has_related:
             return
 
@@ -285,8 +356,10 @@ class DataResource:
 
                 field_option.set(self.obj, related_obj)
 
-    # 递归资源的关系导入数据
-    def save(self):
+    def save(self) -> None:
+        """递归资源的关系导入数据
+
+        """
         if self._saved:
             return
 
@@ -307,7 +380,10 @@ class DataResource:
                 related_not_rely_resource.save()
         self.load_related(rely_on=False)
 
-    def save_obj(self):
+    def save_obj(self) -> Model:
+        """保存数据对象
+
+        """
         obj = self.obj
         check = self.option.check
         get_conflict = check.get_conflict
@@ -345,11 +421,16 @@ class DataResource:
 
         return obj
 
-    def parse_related_tree(self):
+    def parse_related_tree(self) -> None:
+        """递归解析关联数据
+
+        """
         self._parse_related_tree(self)
 
-    # 获取关联资源
-    def get_related_resources(self):
+    def get_related_resources(self) -> None:
+        """获取关联的数据资源对象
+
+        """
         for field_name, sub_index in self.related_index.items():
             field_option = self.option.field_options.get(field_name)
             if not field_option:
@@ -382,9 +463,12 @@ class DataResource:
                 self.related_resources.append(sub_resource)
                 collector.append(sub_resource)
 
-    # 复制资源文件
     @classmethod
-    def copy_files(cls, tmp_dir):
+    def copy_files(cls, tmp_dir: str) -> None:
+        """复制资源文件
+
+        :param tmp_dir: 临时资源存放目录
+        """
         tmp_media_dir = os.path.join(tmp_dir, 'media')
         if not os.path.exists(tmp_media_dir):
             return
@@ -407,7 +491,11 @@ class DataResource:
 
     # 递归解析资源的关联树
     @classmethod
-    def _parse_related_tree(cls, resource):
+    def _parse_related_tree(cls, resource: DataResource) -> None:
+        """递归解析资源的关联树
+
+        :param resource: 数据资源对象
+        """
         if not resource or resource._parsed or not resource.option.has_related:
             return
 
