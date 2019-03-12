@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.db.models import Q, F, QuerySet
 
 from sv_auth import app_settings
