@@ -5,9 +5,12 @@ from django.utils import timezone
 
 
 class Executor(models.Model):
+    """
+    序列化执行任务 func执行函数  params执行参数 context执行上下文
+    """
     func = models.TextField(default='')
     params = models.TextField(default='')
-    extra = models.TextField(default='')
+    context = models.TextField(default='')
 
     create_time = models.DateTimeField(default=timezone.now)
 

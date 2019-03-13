@@ -4,7 +4,7 @@ import enum
 
 from rest_framework.exceptions import ErrorDetail
 
-from sv_base.utils.common.utext import Txt, trans as _
+from sv_base.utils.common.utext import Trans as _
 
 
 default_errors = dict(
@@ -32,7 +32,7 @@ for key, value in default_errors.items():
 
 
 class ErrorMeta(enum.EnumMeta):
-    def __new__(metacls, cls: str, bases: tuple, classdict: enum._EnumDict) -> ErrorMeta:
+    def __new__(mcs, cls: str, bases: tuple, classdict: enum._EnumDict) -> ErrorMeta:
         """初始化格式错误字典
 
         :param cls: 当前类名
@@ -44,7 +44,7 @@ class ErrorMeta(enum.EnumMeta):
         for attr_name, error_desc in list(classdict.items()):
             if attr_name.isupper():
                 error_code = generate_error_code(attr_name)
-                if isinstance(error_desc, Txt):
+                if isinstance(error_desc, _):
                     error_desc.code = error_code
                     detail = error_desc
                 elif isinstance(error_desc, str):
@@ -61,4 +61,4 @@ class ErrorMeta(enum.EnumMeta):
         for attr_name, detail in list(default_errors.items()) + errors:
             classdict[attr_name] = detail
 
-        return enum.EnumMeta.__new__(metacls, cls, bases, classdict)
+        return enum.EnumMeta.__new__(mcs, cls, bases, classdict)

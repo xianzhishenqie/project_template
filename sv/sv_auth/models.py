@@ -1,8 +1,7 @@
-from enum import IntEnum
-
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils import timezone
+from django_enumfield import enum
 
 from sv_base.utils.db.manager import MManager
 from sv_base.utils.resource.models import ResourceModel
@@ -12,25 +11,30 @@ class MUserManager(MManager, UserManager):
     pass
 
 
-# 1级省厅  2级地市
 class Organization(models.Model):
+    """
+    组织
+    """
     name = models.CharField(max_length=100, default='')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, default=None)
 
 
 class User(ResourceModel, AbstractUser):
+    """
+    用户
+    """
     logo = models.ImageField(upload_to='user_logo', default='')
     nickname = models.CharField(max_length=100, default='')
     name = models.CharField(max_length=100, default='')
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, default=None)
 
-    class Group(IntEnum):
+    class Group(enum.Enum):
         ADMIN = 1
         NORMAL = 2
-    class Status(IntEnum):
+    class Status(enum.Enum):
         DELETE = 0
         NORMAL = 1
-    status = models.PositiveIntegerField(default=Status.NORMAL)
+    status = enum.EnumField(Status, default=Status.NORMAL)
     extra = models.TextField(default='')
 
     objects = MUserManager({'status': Status.DELETE})
@@ -60,13 +64,16 @@ class User(ResourceModel, AbstractUser):
 
 
 class Owner(models.Model):
+    """
+    用户拥有的资源
+    """
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='+')
 
-    class PublicMode(IntEnum):
+    class PublicMode(enum.Enum):
         PRIVATE = 0
         INNER = 1
         OUTER = 2
-    public_mode = models.PositiveIntegerField(default=PublicMode.PRIVATE)
+    public_mode = enum.EnumField(PublicMode, default=PublicMode.PRIVATE)
     public_operate = models.BooleanField(default=False)
 
     create_time = models.DateTimeField(default=timezone.now)

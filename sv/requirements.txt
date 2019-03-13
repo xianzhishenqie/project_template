@@ -1,6 +1,7 @@
 gunicorn==19.9.0
 gevent==1.4.0
 django==2.1.7
+django-enumfield==1.5
 djangorestframework==3.9.2
 djangorestframework-xml==1.4.0
 django-redis==4.10.0

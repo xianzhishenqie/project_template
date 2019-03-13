@@ -79,14 +79,7 @@ def contain_zh(word: str) -> object:
     return match
 
 
-class Txt(str):
-    """
-    自定义的字符串类
-    """
-    pass
-
-
-class Trans(Txt):
+class Trans(str):
     """
     国际化字符串类
     """
@@ -98,7 +91,7 @@ class Trans(Txt):
     # 格式化参数
     p = None
 
-    def __new__(cls, s: str, code: Union[int, str, None] = None) -> object:
+    def __new__(cls, s: str, code: Union[int, str, None] = None) -> Trans:
         """生成初始化实例对象
 
         :param s: 国际化字符串
@@ -153,6 +146,3 @@ class Trans(Txt):
             self.p,
             self.code,
         ))
-
-
-trans = Trans
