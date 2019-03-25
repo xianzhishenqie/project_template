@@ -65,7 +65,8 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = auth_models.User
-        fields = ('id', 'username', 'logo', 'name', 'organization', 'status', 'groups', 'rep_name', 'group', 'organization_data')
+        fields = ('id', 'username', 'logo', 'name', 'organization', 'status',
+                  'groups', 'rep_name', 'group', 'organization_data')
 
 
 class OwnerSerializer(ModelSerializer):

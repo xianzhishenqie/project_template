@@ -12,7 +12,6 @@ def make_qrcode(qrcode_str: str, filepath: str) -> None:
     img.save(filepath)
 
 
-
 def parse_qrcode(qrcode_file: object) -> str:
     """解析二维码
 
@@ -22,4 +21,3 @@ def parse_qrcode(qrcode_file: object) -> str:
     qr = qrtools.QR()
     qr.decode(qrcode_file)
     return qr.data
-

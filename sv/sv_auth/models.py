@@ -31,6 +31,7 @@ class User(ResourceModel, AbstractUser):
     class Group(enum.Enum):
         ADMIN = 1
         NORMAL = 2
+
     class Status(enum.Enum):
         DELETE = 0
         NORMAL = 1

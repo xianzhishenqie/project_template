@@ -400,7 +400,8 @@ class DataResource:
             elif check.resolve_conflict_type == ResolveConflictType.REPLACE:
                 if check.conflict_consistency_check and not check.conflict_consistency_check(obj, conflict_obj):
                     # 冲突对象不一致时
-                    logger.warning('obj[%s] replaced by conflict obj[%s], relation inconsistency!' % (obj.__dict__, conflict_obj.__dict__))
+                    logger.warning('obj[%s] replaced by conflict obj[%s], relation inconsistency!', obj.__dict__,
+                                   conflict_obj.__dict__)
                 return conflict_obj
             # 覆盖冲突对象检查(冲突对象可能不一致)
             elif check.resolve_conflict_type == ResolveConflictType.COVER:
@@ -412,7 +413,8 @@ class DataResource:
                             tmp.pop(conflict_ignore_field, None)
                     conflict_obj.__dict__.update(tmp)
                     conflict_obj.save()
-                    logger.warning('obj[%s] cover conflict obj[%s], relation inconsistency!' % (obj.__dict__, conflict_obj.__dict__))
+                    logger.warning('obj[%s] cover conflict obj[%s], relation inconsistency!', obj.__dict__,
+                                   conflict_obj.__dict__)
                 return conflict_obj
             elif check.resolve_conflict_type == ResolveConflictType.IGNORE:
                 obj.save()

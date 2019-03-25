@@ -9,7 +9,6 @@ from sv_auth.models import Organization, User
 logger = logging.getLogger(__name__)
 
 
-
 def org_level(org: Organization) -> int:
     """获取组织级别。
 
@@ -45,10 +44,12 @@ def can_add_org(operate_user: User, parent: Organization) -> bool:
     :param parent: 目标父组织
     :return: bool
     """
+    t_org_level = None
     if parent:
-        l = org_level(parent)
+        # 操作目标组织等级
+        t_org_level = org_level(parent)
         # 目标组织深度超过限制，不能添加
-        if l >= app_settings.ORG_DEPTH:
+        if t_org_level >= app_settings.ORG_DEPTH:
             return False
 
     if operate_user.is_superuser:
@@ -63,8 +64,6 @@ def can_add_org(operate_user: User, parent: Organization) -> bool:
 
     # 操作用户所属组织等级
     o_org_level = get_org_level(operate_user)
-    # 操作目标组织等级
-    t_org_level = org_level(parent)
     o_org = operate_user.organization
     t_org = parent
     # 目标组织等级高于用户组织等级时, 用户不能填加组织
@@ -207,8 +206,8 @@ def get_filter_org_params(user: User, field: str = None) -> Q:
     :param field: 组织关联字段
     :return: 查询条件
     """
-    l = get_org_level(user)
-    if l == 0:
+    user_org_level = get_org_level(user)
+    if user_org_level == 0:
         return Q()
 
     if field:
@@ -217,7 +216,7 @@ def get_filter_org_params(user: User, field: str = None) -> Q:
         base_key = 'organization'
 
     params = Q(**{base_key: user.organization})
-    for i in range(app_settings.ORG_DEPTH - l):
+    for i in range(app_settings.ORG_DEPTH - user_org_level):
         base_key = '{}{}'.format(base_key, '__parent')
         params = params | Q(**{base_key: user.organization})
 

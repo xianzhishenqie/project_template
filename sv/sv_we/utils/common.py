@@ -71,7 +71,7 @@ def is_we_access(app_id, signature, timestamp, nonce):
     try:
         signature_list = sorted([token, timestamp, nonce])
         calc_signature = sha1(''.join(signature_list))
-    except:
+    except Exception:
         return False
     else:
         if calc_signature == signature:

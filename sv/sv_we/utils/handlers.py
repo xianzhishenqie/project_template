@@ -20,7 +20,7 @@ class UserMessageHandler:
         self.content = receive_data.get('Content')
 
     def result(self, data=None):
-        res =  {
+        res = {
             'ToUserName': self.from_username,
             'FromUserName': self.to_username,
             'CreateTime': int(time.mktime(timezone.now().timetuple())),

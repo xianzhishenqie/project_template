@@ -114,7 +114,9 @@ def can_operate_obj(user: User, obj: Owner) -> bool:
         # 普通用户可操作自己和同级用户公开操作的资源
         if user == obj.user:
             return True
-        elif user.organization == obj.user.organization and obj.public_mode == Owner.PublicMode.INNER and obj.public_operate:
+        elif (user.organization == obj.user.organization
+              and obj.public_mode == Owner.PublicMode.INNER
+              and obj.public_operate):
             return True
         else:
             return False

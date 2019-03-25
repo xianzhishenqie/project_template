@@ -54,7 +54,11 @@ class RequestData:
     """
     请求数据封装类
     """
-    def __init__(self, request: Union[Request], is_query: bool = False, data_filter_class: Type[DataFilter] = DataFilter, strict: bool = False) -> None:
+    def __init__(self,
+                 request: Union[Request],
+                 is_query: bool = False,
+                 data_filter_class: Type[DataFilter] = DataFilter,
+                 strict: bool = False) -> None:
         """请求数据初始化
 
         :param request: 请求对象
@@ -111,7 +115,7 @@ def handle_bool_value(value: object) -> object:
 
         try:
             return bool(int(value))
-        except:
+        except Exception:
             pass
 
     return value

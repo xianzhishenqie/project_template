@@ -130,7 +130,8 @@ def get_sv_urls() -> tuple:
         for sub_module_name, sub_module_patterns in app_patterns.items():
             sub_module_path_name = settings.SUB_MODULES[sub_module_name]
             patterns.append(
-                path(_get_sub_path(sub_module_path_name), include((sub_module_patterns, app_name), namespace=sub_module_name))
+                path(_get_sub_path(sub_module_path_name),
+                     include((sub_module_patterns, app_name), namespace=sub_module_name))
             )
 
     # 收集子模块的api路由
@@ -138,7 +139,8 @@ def get_sv_urls() -> tuple:
         for sub_module_name, sub_module_apipatterns in app_apipatterns.items():
             sub_module_path_name = settings.SUB_MODULES[sub_module_name]
             apipatterns.append(
-                path(_get_sub_path(sub_module_path_name), include((sub_module_apipatterns, app_name), namespace=sub_module_name))
+                path(_get_sub_path(sub_module_path_name),
+                     include((sub_module_apipatterns, app_name), namespace=sub_module_name))
             )
 
     return patterns, apipatterns

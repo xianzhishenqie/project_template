@@ -10,6 +10,7 @@ class Http404Page:
         exception = exception or Exception()
         return defaults.page_not_found(request, exception)
 
+
 class Http403Page:
     """
     默认的403页面响应

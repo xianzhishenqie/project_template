@@ -19,6 +19,7 @@ def async_exe(func: Callable, args: tuple = None, kwargs: dict = None, delay: in
     """
     args = args or ()
     kwargs = kwargs or {}
+
     def tmp():
         func(*args, **kwargs)
     scheduler = sched.scheduler(time.time, time.sleep)
@@ -29,7 +30,11 @@ def async_exe(func: Callable, args: tuple = None, kwargs: dict = None, delay: in
     return thread
 
 
-def async_exe_once(func: Callable, args: tuple = None, kwargs: dict = None, delay: int = 0, timeout: int = 3) -> Optional[threading.Thread]:
+def async_exe_once(func: Callable,
+                   args: tuple = None,
+                   kwargs: dict = None,
+                   delay: int = 0,
+                   timeout: int = 3) -> Optional[threading.Thread]:
     """异步执行一次方法
 
     :param func: 待执行方法

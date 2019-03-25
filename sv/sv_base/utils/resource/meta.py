@@ -102,7 +102,9 @@ class CheckOption:
         # 冲突替换检查
         self.conflict_ignore_fields = options.get('conflict_ignore_fields', None)
         self.conflict_consistency_fields = options.get('conflict_consistency_fields', None)
-        self.conflict_consistency_check = options.get('conflict_consistency_check', self.default_conflict_consistency_check if self.conflict_consistency_fields else None)
+        self.conflict_consistency_check = options.get('conflict_consistency_check',
+                                                      self.default_conflict_consistency_check
+                                                      if self.conflict_consistency_fields else None)
 
     def default_get_conflict(self, obj: Model) -> Optional[Model]:
         """默认获取冲突对象
@@ -147,7 +149,7 @@ class DataOption:
         if root_model:
             try:
                 root_model = try_import(root_model)
-            except:
+            except Exception:
                 raise ResourceException('invalid root config %s' % options['root'])
         self.root_model = root_model
         if self.root_model:

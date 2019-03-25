@@ -54,4 +54,3 @@ def we_access(request, app_id):
             echostr = ''
 
         return Response(echostr)
-

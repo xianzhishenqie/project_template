@@ -91,7 +91,11 @@ class UserViewSet(BatchSetModelMixin, DestroyModelMixin, CacheModelMixin, SVMixi
 
     def sub_perform_create(self, serializer):
         validated_data = serializer.validated_data
-        if not org_util.can_add_user(self.request.user, validated_data.get('organization'), validated_data.get('groups')):
+        if not org_util.can_add_user(
+                self.request.user,
+                validated_data.get('organization'),
+                validated_data.get('groups')
+        ):
             raise exceptions.PermissionDenied(Error.NO_PERMISSION)
 
         return super(UserViewSet, self).sub_perform_create(serializer)

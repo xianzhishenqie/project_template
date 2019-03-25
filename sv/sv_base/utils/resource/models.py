@@ -39,4 +39,3 @@ class ResourceModel(models.Model):
 
     class Meta:
         abstract = True
-

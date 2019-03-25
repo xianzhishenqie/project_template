@@ -41,7 +41,6 @@ class CDATATextXMLRenderer(TextXMLRenderer):
         else:
             tags.append(self._cdata(data))
 
-
     def _cdata(self, text):
         if isinstance(text, six.string_types):
             el = Element('a')

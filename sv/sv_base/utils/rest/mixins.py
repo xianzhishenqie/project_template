@@ -59,7 +59,7 @@ def _generate_cache_key(view, queryset):
     view_name = view.__class__.__name__
     try:
         key_str = queryset.query.__str__()
-    except EmptyResultSet as e:
+    except EmptyResultSet:
         # 无查询的空对象
         key_str = 'EmptyResultSet'
 
@@ -131,7 +131,7 @@ class CacheModelMixin:
             if isinstance(c, (six.string_types, six.text_type)):
                 try:
                     c = import_string(c)
-                except:
+                except Exception:
                     continue
             cache_view_name = _generate_cache_view_name(c)
             cache = CacheProduct(cache_view_name)

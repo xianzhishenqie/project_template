@@ -71,4 +71,3 @@ class usb:
     def __exit__(self, exc_type, exc_val, exc_tb):
         for mount_path in self.mount_paths:
             umount_device(mount_path)
-

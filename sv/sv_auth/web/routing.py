@@ -6,5 +6,4 @@ websockets = (
     consumers.UserWebsocket,
 )
 
-
 routerpatterns = []

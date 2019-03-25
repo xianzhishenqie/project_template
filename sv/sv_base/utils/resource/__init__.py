@@ -2,9 +2,7 @@ from typing import Optional, Union
 
 from django.db.models import QuerySet
 
-from .config import Resource
 from .execute import Dumper, Loader
-from .meta import ResolveConflictType, RelationType
 
 
 def dumps(root_objs: Union[QuerySet, list], to_dir: Optional[str] = None) -> dict:

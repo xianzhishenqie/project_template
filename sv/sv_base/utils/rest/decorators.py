@@ -35,4 +35,3 @@ def request_data(strict: bool = False) -> Callable:
             return func(request, *args, **kwargs)
         return _wrapper
     return wrapper
-

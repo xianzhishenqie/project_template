@@ -16,6 +16,7 @@ from Cython.Distutils import build_ext
 
 from sv.settings import BASE_DIR
 
+
 Options.docstrings = False
 
 # 需要编译的目录:
@@ -39,6 +40,8 @@ compile_configs = [
 copy_file_list = []
 # 需要编译的模块列表
 ext_modules_list = []
+
+
 def parse_ext_modules(dir_path, keep_dirs=None, keep_files=None):
     package_file = os.path.join(dir_path, '__init__.py')
     is_package = os.path.exists(package_file)
@@ -58,7 +61,9 @@ def parse_ext_modules(dir_path, keep_dirs=None, keep_files=None):
                 continue
 
             relative_path = file_path.replace(BASE_DIR, '').lstrip('/')
-            if package_compile_check and file_path.endswith('.py') and (not keep_files or (keep_files and relative_path not in keep_files)):
+            if (package_compile_check
+                    and file_path.endswith('.py')
+                    and (not keep_files or (keep_files and relative_path not in keep_files))):
                 if file_path == package_file:
                     copy_file_list.append(file_path)
                 else:
@@ -100,7 +105,7 @@ def execute_copy_files():
 
 
 for name, config in compile_configs:
-    is_dir =  config.get('is_dir', False)
+    is_dir = config.get('is_dir', False)
     path = os.path.join(BASE_DIR, name)
     if not os.path.exists(path):
         raise Exception('path[%s] not exist' % path)

@@ -77,4 +77,3 @@ def value_filter(value: object, param: Union[type, set, tuple, list], strict: bo
     if ret:
         return ret[0]
     return None
-

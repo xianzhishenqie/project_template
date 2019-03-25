@@ -39,7 +39,7 @@ def ping(ip: str, timeout: int = 2, count: int = 2) -> bool:
     """
     try:
         res = subprocess.check_output('ping -c %s -w %s %s' % (count, timeout, ip), shell=True)
-    except:
+    except Exception:
         return False
     if res.find('icmp_'):
         return True
@@ -57,7 +57,7 @@ def get_ping(ip: str) -> int:
         p = subprocess.getoutput("ping -c 1 {}".format(ip))
         pattern = re.compile(r"rtt min/avg/max/mdev = .*/(.*?)/.*/0.000 ms")
         delay = int(float(pattern.findall(p)[0]))
-    except:
+    except Exception:
         delay = 0
     return delay
 
