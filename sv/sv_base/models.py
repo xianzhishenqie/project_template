@@ -3,6 +3,8 @@ import pickle
 from django.db import models
 from django.utils import timezone
 
+from sv_base.utils.common.utext import ec
+
 
 class Executor(models.Model):
     """
@@ -21,16 +23,22 @@ class Executor(models.Model):
 
     @classmethod
     def dump_executor(cls, executor):
+        func = executor.get('func')
+        if not callable(func):
+            raise Exception(f'not callable function: {func}')
+
+        params = executor.get('params', {})
+
         condition = {
-            'func': pickle.dumps(executor['func']),
-            'params': pickle.dumps(executor.get('params', {})),
+            'func': pickle.dumps(func),
+            'params': pickle.dumps(params),
         }
         return condition
 
     def load_executor(self):
         executor = {
-            'func': pickle.loads(str(self.func)),
-            'params': pickle.loads(str(self.params)),
+            'func': pickle.loads(ec(self.func)),
+            'params': pickle.loads(ec(self.params)),
         }
         return executor
 
