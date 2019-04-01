@@ -3,7 +3,7 @@ import os
 import subprocess
 from typing import List
 
-from sv_base.utils.common.utext import rk
+from sv_base.utils.base.text import rk
 
 
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def mount_device(device: str) -> str:
 def umount_device(mount_path: str) -> None:
     """卸载usb设备
 
-    :param device: usb设备挂载路径
+    :param mount_path: usb设备挂载路径
     :return: None
     """
     umount_cmd = 'umount %s' % mount_path

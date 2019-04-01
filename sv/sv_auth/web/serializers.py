@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 
 from rest_framework import serializers
 
-from sv_base.utils.rest.serializers import ModelSerializer
+from sv_base.extensions.rest.serializers import ModelSerializer
 
 from sv_auth import models as auth_models
 

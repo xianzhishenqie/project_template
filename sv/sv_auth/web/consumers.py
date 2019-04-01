@@ -1,6 +1,6 @@
 from channels.layers import get_channel_layer
 
-from sv_base.utils.websocket import Websocket
+from sv_base.extensions.websocket import Websocket
 from sv_auth.models import User
 
 

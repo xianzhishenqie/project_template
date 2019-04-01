@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 
-from sv_base.utils.common.ubase import NameValue
+from sv_base.utils.base.type import NameValue
 
 
 class ChoiceMeta(enum.EnumMeta):

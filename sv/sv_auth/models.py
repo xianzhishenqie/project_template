@@ -3,8 +3,8 @@ from django.db import models
 from django.utils import timezone
 from django_enumfield import enum
 
-from sv_base.utils.db.manager import MManager
-from sv_base.utils.resource.models import ResourceModel
+from sv_base.extensions.db.manager import MManager
+from sv_base.extensions.resource.models import ResourceModel
 
 
 class MUserManager(MManager, UserManager):

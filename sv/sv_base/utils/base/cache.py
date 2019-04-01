@@ -2,7 +2,7 @@ import uuid
 
 from django.core.cache import cache, _create_cache
 
-from sv_base.utils.common.utext import md5
+from sv_base.utils.base.text import md5
 
 
 class CacheProduct:

@@ -3,7 +3,7 @@ import pickle
 from django.db import models
 from django.utils import timezone
 
-from sv_base.utils.common.utext import ec
+from sv_base.utils.base.text import ec
 
 
 class Executor(models.Model):

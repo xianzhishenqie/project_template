@@ -7,8 +7,8 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from sv_base.utils.rest.decorators import request_data
-from sv_base.utils.rest.parsers import TextXMLParser
+from sv_base.extensions.rest.decorators import request_data
+from sv_base.extensions.rest.parsers import TextXMLParser
 
 from sv_we import setting
 from sv_we.utils import common

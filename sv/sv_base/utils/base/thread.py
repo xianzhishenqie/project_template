@@ -5,7 +5,7 @@ import time
 from typing import Callable, Optional
 
 from django.core.cache import cache
-from sv_base.utils.common.utext import md5
+from sv_base.utils.base.text import md5
 
 
 def async_exe(func: Callable, args: tuple = None, kwargs: dict = None, delay: int = 0) -> threading.Thread:

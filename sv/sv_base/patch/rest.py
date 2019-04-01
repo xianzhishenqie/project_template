@@ -11,7 +11,7 @@ from rest_framework.fields import FileField
 from rest_framework.settings import api_settings
 from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 
-from sv_base.utils.common.utext import Trans
+from sv_base.extensions.project.trans import Trans
 
 
 def _get_error_details(data: object, default_code: Union[int, str, None] = None) -> object:

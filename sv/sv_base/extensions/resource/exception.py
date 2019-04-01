@@ -1,0 +1,3 @@
+
+class ResourceException(Exception):
+    pass

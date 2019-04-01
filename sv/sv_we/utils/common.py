@@ -4,7 +4,7 @@ import datetime
 from django.db import transaction
 from django.utils import timezone
 
-from sv_base.utils.common.utext import md5, sha1
+from sv_base.utils.base.text import md5, sha1
 from sv_base.utils.tools.http import HttpClient
 
 from sv_auth.models import User

@@ -13,10 +13,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from sv_base.utils.common.ucache import CacheProduct, delete_cache
-from sv_base.utils.common.utext import md5
-from sv_base.utils.rest.pagination import VueTablePagination, CacheVueTablePagination
-from sv_base.utils.rest.request import RequestData
+from sv_base.utils.base.cache import CacheProduct, delete_cache
+from sv_base.utils.base.text import md5
+from sv_base.extensions.rest.pagination import VueTablePagination, CacheVueTablePagination
+from sv_base.extensions.rest.request import RequestData
 
 
 class SVMixin:

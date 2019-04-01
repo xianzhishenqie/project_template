@@ -2,7 +2,7 @@
 import functools
 from typing import Callable
 
-from sv_base.utils.rest.request import RequestData
+from sv_base.extensions.rest.request import RequestData
 
 
 def api_request_data(strict: bool = False) -> Callable:

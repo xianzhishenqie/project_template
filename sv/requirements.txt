@@ -16,5 +16,6 @@ paramiko==2.4.2
 qrcode==6.1
 qrtools==0.0.2
 lxml==4.3.2
+pyminizip==0.2.4
 
 Cython==0.29.6

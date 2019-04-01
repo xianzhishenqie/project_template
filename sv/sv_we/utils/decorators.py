@@ -3,7 +3,7 @@ import functools
 
 from django.contrib.auth import login
 
-from sv_base.utils import views as default_views
+from sv_base.extensions.project import views as default_views
 
 from sv_we import models as we_models
 

@@ -35,6 +35,25 @@ def list_dir(path: str, deep: bool = False) -> list:
     return data
 
 
+def list_files(path: str, deep: bool = False) -> list:
+    """目录包含的文件列表
+
+    :param path: 目录路径
+    :param deep: 是否向下获取多级目录
+    :return: 包含的文件列表
+    """
+    file_list = os.listdir(path)
+    files = []
+    for filename in file_list:
+        file_path = os.path.join(path, filename)
+        if os.path.isdir(file_path):
+            if deep:
+                files.extend(list_files(file_path, deep=deep))
+        else:
+            files.append(file_path)
+    return files
+
+
 def get_file_suffix(name: str) -> str:
     """获取文件后缀名
 

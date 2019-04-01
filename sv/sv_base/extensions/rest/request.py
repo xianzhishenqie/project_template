@@ -3,7 +3,7 @@ from typing import Union, Type
 from django.http import QueryDict
 from rest_framework.request import Request
 
-from sv_base.utils.common.ulist import list_filter, value_filter
+from sv_base.utils.base.list import list_filter, value_filter
 
 
 class DataFilter:

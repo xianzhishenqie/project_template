@@ -1,6 +1,6 @@
 from enum import Enum
-from sv_base.utils.error import ErrorMeta
-from sv_base.utils.common.utext import Trans as _
+from sv_base.extensions.project.error import ErrorMeta
+from sv_base.extensions.project.trans import Trans as _
 
 
 class Error(Enum, metaclass=ErrorMeta):

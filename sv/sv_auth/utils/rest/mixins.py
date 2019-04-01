@@ -1,6 +1,6 @@
 from django.db.models import QuerySet
 
-from sv_base.utils.rest.mixins import BatchSetModelMixin
+from sv_base.extensions.rest.mixins import BatchSetModelMixin
 
 from sv_auth.models import Owner
 from sv_auth.utils.owner import filter_operate_queryset

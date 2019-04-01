@@ -9,9 +9,9 @@ from django.conf.urls import url
 from django.urls import include, path
 from channels.routing import URLRouter
 
-from sv_base.utils.common.uthread import async_exe, async_exe_once
-from sv_base.utils.rest.routers import rest_path
-from sv_base.utils.websocket.routers import ws_path
+from sv_base.utils.base.thread import async_exe, async_exe_once
+from sv_base.extensions.rest.routers import rest_path
+from sv_base.extensions.websocket.routers import ws_path
 
 
 def get_app_name(module_name: str) -> str:

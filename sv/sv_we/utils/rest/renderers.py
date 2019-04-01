@@ -4,8 +4,8 @@ from lxml.etree import CDATA, Element, tostring
 from django.utils import six
 from django.utils.encoding import smart_text
 
-from sv_base.utils.common.utext import dc
-from sv_base.utils.rest.renderers import TextXMLRenderer
+from sv_base.utils.base.text import dc
+from sv_base.extensions.rest.renderers import TextXMLRenderer
 
 
 class CDATATextXMLRenderer(TextXMLRenderer):

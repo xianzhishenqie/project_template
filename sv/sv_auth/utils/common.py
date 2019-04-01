@@ -1,6 +1,6 @@
 from typing import Union, Optional
 
-from sv_base.utils.db.common import get_obj
+from sv_base.extensions.db.common import get_obj
 from sv_auth.models import User
 
 

@@ -16,7 +16,7 @@ Including another URLconf
 
 from django.urls import path, include
 
-from sv_base.utils.app import get_sv_urls
+from sv_base.extensions.project.app import get_sv_urls
 
 
 patterns, apipatterns = get_sv_urls()

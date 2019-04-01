@@ -4,7 +4,7 @@ import enum
 
 from rest_framework.exceptions import ErrorDetail
 
-from sv_base.utils.common.utext import Trans as _
+from .trans import Trans as _
 
 
 default_errors = dict(

@@ -215,7 +215,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 
-    'EXCEPTION_HANDLER': 'sv_base.utils.rest.views.exception_handler',
+    'EXCEPTION_HANDLER': 'sv_base.extensions.rest.views.exception_handler',
 
     'ORDERING_PARAM': 'sort',
 
