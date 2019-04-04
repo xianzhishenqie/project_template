@@ -5,7 +5,7 @@ import pickle
 import logging
 import os
 import shutil
-from typing import Type
+from typing import Type, Optional
 
 from django.conf import settings
 from django.db.models import Model, Field
@@ -100,11 +100,14 @@ class ModelResource:
         self.custom_related_resource = {}
         self.related_resources = []
         self.related_resource = {}
+        self.related_rely_resources = []
+        self.related_not_rely_resources = []
 
         # 初始化对象序列化数据
         self.data = None
         self.files = set()
         self._parsed = False
+        self._rely_checked = False
         self._dumped = False
 
         # 标识资源已初始化
@@ -179,7 +182,14 @@ class ModelResource:
         """递归解析资源的关联树
 
         """
-        self._parse_related_tree(self)
+        if self._parsed or not self.option.has_related:
+            return
+
+        self.get_related_resources()
+        self._parsed = True
+
+        for related_resource in self.related_resources:
+            related_resource.parse_related_tree()
 
     def get_related_resources(self) -> None:
         """获取关联资源
@@ -195,6 +205,11 @@ class ModelResource:
                 self.custom_related_resource[field_name] = value
                 continue
 
+            if field_option.rely_on:
+                collector = self.related_rely_resources
+            else:
+                collector = self.related_not_rely_resources
+
             if isinstance(value, list):
                 field_related_resources = self.related_resource.setdefault(field_name, [])
                 for obj in value:
@@ -203,13 +218,44 @@ class ModelResource:
                         field_related_resources.append(sub_resource)
                     if sub_resource not in self.related_resources:
                         self.related_resources.append(sub_resource)
+                        collector.append(sub_resource)
             else:
                 sub_resource = type(self)(value, self.root_model) if value else None
                 self.related_resource[field_name] = sub_resource
                 if sub_resource and sub_resource not in self.related_resources:
                     self.related_resources.append(sub_resource)
+                    collector.append(sub_resource)
 
-    # 复制资源关联的文件
+    def check_circular_dependency(self, rely_chain: Optional[set] = None, checking_list: Optional[set] = None) -> None:
+        """检查循环依赖
+
+        :param rely_chain: 依赖链资源
+        :param checking_list: 正在检查的资源列表
+        """
+        if not rely_chain and self._rely_checked:
+            return
+
+        if checking_list:
+            if not rely_chain and self.p_key in checking_list:
+                return
+        else:
+            checking_list = set()
+        checking_list.add(self.p_key)
+
+        if rely_chain and self in rely_chain:
+            raise ResourceException('resource[%s] rely on self' % self.obj.__dict__)
+
+        for related_rely_resource in self.related_rely_resources:
+            next_rely_chain = copy.copy(rely_chain) if rely_chain else set()
+            next_rely_chain.add(self)
+            related_rely_resource.check_circular_dependency(rely_chain=next_rely_chain, checking_list=checking_list)
+
+        self._rely_checked = True
+        checking_list.remove(self.p_key)
+
+        for related_not_rely_resource in self.related_not_rely_resources:
+            related_not_rely_resource.check_circular_dependency(checking_list=checking_list)
+
     @classmethod
     def copy_files(cls, tmp_dir: str, copying_files: list) -> None:
         """复制资源关联的文件
@@ -240,22 +286,6 @@ class ModelResource:
             except Exception as e:
                 logger.error('copy file [%s] to [%s] error: %s', src_file_path, tmp_path, e)
                 continue
-
-    # 递归解析资源的关联树
-    @classmethod
-    def _parse_related_tree(cls, resource: ModelResource) -> None:
-        """递归解析资源的关联树
-
-        :param resource: 对象资源实例
-        """
-        if not resource or resource._parsed or not resource.option.has_related:
-            return
-
-        resource.get_related_resources()
-        resource._parsed = True
-
-        for related_resource in resource.related_resources:
-            cls._parse_related_tree(related_resource)
 
 
 class DataResource:
@@ -320,13 +350,9 @@ class DataResource:
         self.related_rely_resources = []
         self.related_not_rely_resources = []
 
-        # 初始化对象父属者(只能有一个)
-        self.parent_resource = None
-        # 初始化对象拥有者(可以是多个)
-        self.owner_resources = []
-
         self.obj = None
         self._parsed = False
+        self._rely_checked = False
         self._saved = False
 
         self._inited = True
@@ -463,7 +489,14 @@ class DataResource:
         """递归解析关联数据
 
         """
-        self._parse_related_tree(self)
+        if self._parsed or not self.option.has_related:
+            return
+
+        self.get_related_resources()
+        self._parsed = True
+
+        for related_resource in self.related_resources:
+            related_resource.parse_related_tree()
 
     def get_related_resources(self) -> None:
         """获取关联的数据资源对象
@@ -484,26 +517,52 @@ class DataResource:
                 collector = self.related_not_rely_resources
 
             if isinstance(sub_index, list):
-                if sub_index:
-                    for sub_key in sub_index:
-                        sub_data = self.resource_data_pool[sub_key]
-                        sub_resource = type(self)(sub_data, self.root_model)
-                        sub_resource.owner_resources.append(self)
-
-                        self.related_resource.setdefault(field_name, []).append(sub_resource)
+                field_related_resources = self.related_resource.setdefault(field_name, [])
+                for sub_key in sub_index:
+                    sub_data = self.resource_data_pool[sub_key]
+                    sub_resource = type(self)(sub_data, self.root_model)
+                    if sub_resource not in field_related_resources:
+                        field_related_resources.append(sub_resource)
+                    if sub_resource not in self.related_resources:
                         self.related_resources.append(sub_resource)
                         collector.append(sub_resource)
-                else:
-                    self.related_resource[field_name] = []
             else:
                 sub_data = self.resource_data_pool[sub_index] if sub_index else None
                 sub_resource = type(self)(sub_data, self.root_model) if sub_data else None
-                if sub_resource:
-                    sub_resource.owner_resources.append(self)
-
                 self.related_resource[field_name] = sub_resource
-                self.related_resources.append(sub_resource)
-                collector.append(sub_resource)
+                if sub_resource and sub_resource not in self.related_resources:
+                    self.related_resources.append(sub_resource)
+                    collector.append(sub_resource)
+
+    def check_circular_dependency(self, rely_chain: Optional[set] = None, checking_list: Optional[set] = None) -> None:
+        """检查循环依赖
+
+        :param rely_chain: 依赖链资源
+        :param checking_list: 正在检查的资源列表
+        """
+        if not rely_chain and self._rely_checked:
+            return
+
+        if checking_list:
+            if not rely_chain and self.p_key in checking_list:
+                return
+        else:
+            checking_list = set()
+        checking_list.add(self.p_key)
+
+        if rely_chain and self in rely_chain:
+            raise ResourceException('resource[%s] rely on self' % self.data)
+
+        for related_rely_resource in self.related_rely_resources:
+            next_rely_chain = copy.copy(rely_chain) if rely_chain else set()
+            next_rely_chain.add(self)
+            related_rely_resource.check_circular_dependency(rely_chain=next_rely_chain, checking_list=checking_list)
+
+        self._rely_checked = True
+        checking_list.remove(self.p_key)
+
+        for related_not_rely_resource in self.related_not_rely_resources:
+            related_not_rely_resource.check_circular_dependency(checking_list=checking_list)
 
     @classmethod
     def _copy_files(cls, tmp_dir: str, dest_dir: str) -> None:
@@ -530,7 +589,6 @@ class DataResource:
                 except Exception as e:
                     logger.error('copy file [%s] to [%s] error: %s', src_path, dst_path, e)
 
-    # 复制资源文件
     @classmethod
     def copy_files(cls, tmp_dir: str) -> None:
         """复制资源文件
@@ -542,19 +600,3 @@ class DataResource:
 
         tmp_root_dir = os.path.join(tmp_dir, root_file_dir_name)
         cls._copy_files(tmp_root_dir, '/')
-
-    # 递归解析资源的关联树
-    @classmethod
-    def _parse_related_tree(cls, resource: DataResource) -> None:
-        """递归解析资源的关联树
-
-        :param resource: 数据资源对象
-        """
-        if not resource or resource._parsed or not resource.option.has_related:
-            return
-
-        resource.get_related_resources()
-        resource._parsed = True
-
-        for related_resource in resource.related_resources:
-            cls._parse_related_tree(related_resource)

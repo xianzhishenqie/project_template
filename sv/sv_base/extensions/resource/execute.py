@@ -36,6 +36,7 @@ class Dumper:
             self.resource_root.append(root_resource.p_key)
             # 解析根资源的资源关联树, 注满资源池
             root_resource.parse_related_tree()
+            root_resource.check_circular_dependency()
 
         # 序列化资源池资源，设置关联关系索引，资源数据，关联文件
         for key, resource in self.model_resource_class.resource_pool.items():
@@ -75,6 +76,7 @@ class Loader:
             root_model = self.data_resource_class.parse_model(root_data)
             resource = self.data_resource_class(root_data, root_model)
             resource.parse_related_tree()
+            resource.check_circular_dependency()
             root_resources.append(resource)
 
         # 从根资源开始递归导入数据
