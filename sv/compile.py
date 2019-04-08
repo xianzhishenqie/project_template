@@ -89,7 +89,7 @@ def parse_original_path(dir_path):
 def execute_copy_files():
     for src_file_path in copy_file_list:
         relative_path = src_file_path.replace(BASE_DIR, '').lstrip('/')
-        dst_file_path = os.path.join(BASE_DIR, 'build/x-oj', relative_path)
+        dst_file_path = os.path.join(BASE_DIR, 'build/sv', relative_path)
         dir_dst_path = os.path.dirname(dst_file_path)
         if not os.path.exists(dir_dst_path):
             os.makedirs(dir_dst_path)
