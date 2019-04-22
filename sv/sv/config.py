@@ -17,6 +17,8 @@ SV_APP_PATHS = [
 ]
 
 
+REDIS_PASS = "v105uCdcjQQuCdgww"
+
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 DATABASES = {

@@ -4,7 +4,6 @@ from typing import Optional, Union, Type
 from django.db import models
 from django.db.models import Model, QuerySet, Field
 from django.utils.module_loading import import_string
-from django.utils import six
 
 from .exception import ResourceException
 
@@ -269,9 +268,9 @@ def get_serializable_value(obj: Model, field: Field) -> object:
     """
     value = obj.serializable_value(field.attname)
     if isinstance(field, convert_string_fields):
-        if value and not isinstance(value, six.string_types):
+        if value and not isinstance(value, str):
             value = field.value_to_string(obj)
     elif isinstance(field, file_fields):
-        if value and not isinstance(value, six.string_types):
+        if value and not isinstance(value, str):
             value = value.name
     return value

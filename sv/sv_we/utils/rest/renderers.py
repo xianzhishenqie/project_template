@@ -1,7 +1,6 @@
 
 from lxml.etree import CDATA, Element, tostring
 
-from django.utils import six
 from django.utils.encoding import smart_text
 
 from sv_base.utils.base.text import dc
@@ -42,7 +41,7 @@ class CDATATextXMLRenderer(TextXMLRenderer):
             tags.append(self._cdata(data))
 
     def _cdata(self, text):
-        if isinstance(text, six.string_types):
+        if isinstance(text, str):
             el = Element('a')
             el.text = CDATA(text)
             return dc(tostring(el)[3:-4])

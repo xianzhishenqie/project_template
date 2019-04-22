@@ -4,7 +4,6 @@ import json
 from django.conf import settings
 from django.db.models import Model, QuerySet
 from django.db.models.sql.datastructures import EmptyResultSet
-from django.utils import six
 from django.utils.module_loading import import_string
 
 from rest_framework import exceptions, mixins, status
@@ -13,7 +12,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from sv_base.utils.base.cache import CacheProduct, delete_cache
+from sv_base.utils.base.cache import CacheProduct
 from sv_base.utils.base.text import md5
 from sv_base.extensions.rest.pagination import VueTablePagination, CacheVueTablePagination
 from sv_base.extensions.rest.request import RequestData
@@ -113,7 +112,7 @@ class CacheModelMixin:
         return getattr(self, 'page_cache_age', settings.DEFAULT_CACHE_AGE)
 
     def clear_cache(self):
-        delete_cache(self.cache)
+        self.cache.reset()
         if hasattr(self, 'related_cache_classes'):
             self.clear_cls_cache(self.related_cache_classes)
 
@@ -128,14 +127,14 @@ class CacheModelMixin:
         if not isinstance(cls, (list, tuple)):
             cls = [cls]
         for c in cls:
-            if isinstance(c, (six.string_types, six.text_type)):
+            if isinstance(c, str):
                 try:
                     c = import_string(c)
                 except Exception:
                     continue
             cache_view_name = _generate_cache_view_name(c)
             cache = CacheProduct(cache_view_name)
-            delete_cache(cache)
+            cache.reset()
 
     def paginate_queryset_flag(self, queryset: QuerySet) -> bool:
         """判断是否需要进行查询

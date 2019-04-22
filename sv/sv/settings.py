@@ -148,23 +148,24 @@ DEFAULT_CACHE_AGE = 300
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://localhost:6379/1',
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'PASSWORD': REDIS_PASS,
         }
     }
 }
 
 
-ASGI_APPLICATION = "sv.routing.application"
+ASGI_APPLICATION = 'sv.routing.application'
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("localhost", 6379)],
-            "prefix": u"sv",
-            "expiry": 60 * 10,
-            "capacity": 8192,
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [f'redis://:{REDIS_PASS}@127.0.0.1:6379/0'],
+            'prefix': 'sv',
+            'expiry': 60 * 10,
+            'capacity': 8192,
         },
     },
 }

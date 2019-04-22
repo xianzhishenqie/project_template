@@ -7,6 +7,7 @@
 
 import os
 import shutil
+import sys
 import filecmp
 from distutils.core import setup
 from Cython.Build import cythonize
@@ -18,6 +19,9 @@ from sv.settings import BASE_DIR
 
 
 Options.docstrings = False
+
+
+project_name = os.path.split(BASE_DIR)[1]
 
 # 需要编译的目录:
 #   ('sv_base', {
@@ -89,7 +93,7 @@ def parse_original_path(dir_path):
 def execute_copy_files():
     for src_file_path in copy_file_list:
         relative_path = src_file_path.replace(BASE_DIR, '').lstrip('/')
-        dst_file_path = os.path.join(BASE_DIR, 'build/sv', relative_path)
+        dst_file_path = os.path.join(BASE_DIR, f'build/{project_name}', relative_path)
         dir_dst_path = os.path.dirname(dst_file_path)
         if not os.path.exists(dir_dst_path):
             os.makedirs(dir_dst_path)
@@ -128,15 +132,50 @@ for item in copy_file_list:
 for item in ext_modules_list:
     print('prepare compile module: %s' % item[0])
 
-# execute_copy_files()
+execute_copy_files()
 
 ext_modules = [
     Extension(ext_modules_item[0], ext_modules_item[1]) for ext_modules_item in ext_modules_list
 ]
 
 setup(
-    name='sv',
+    name=project_name,
     cmdclass={'build_ext': build_ext},
     language_level=3,
-    ext_modules=cythonize(ext_modules, build_dir='build/sv-build')
+    ext_modules=cythonize(ext_modules, build_dir=f'build/{project_name}-build')
 )
+
+
+setup_str = f'''
+from setuptools import setup, find_packages
+
+setup(
+    name='{project_name}',
+    version='1.0',
+    packages=find_packages(),
+    package_data={{
+        '': ['*.so', '*.po'],
+    }},
+    platforms=["all"],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Operating System :: OS Independent',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: Implementation',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Software Development :: Libraries'
+    ],
+)
+'''
+setup_file_path = os.path.join(dest_dir, 'setup.py')
+with open(setup_file_path, 'w') as f:
+    f.write(setup_str)
+
+os.system('{} {} bdist_wheel --universal'.format(sys.executable, setup_file_path))

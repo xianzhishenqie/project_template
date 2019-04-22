@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Optional, Type
 
 from django.db.models import Model
-from django.utils import six
 
 from .meta import DataOption
 
@@ -26,7 +25,7 @@ class ResourceBase(type):
         return new_class
 
 
-class Resource(six.with_metaclass(ResourceBase)):
+class Resource(metaclass=ResourceBase):
     """
     资源配置父类
     """
