@@ -23,6 +23,8 @@ Options.docstrings = False
 
 project_name = os.path.split(BASE_DIR)[1]
 
+dest_dir = os.path.join(BASE_DIR, f'build/{project_name}')
+
 # 需要编译的目录:
 #   ('sv_base', {
 #       'is_dir': True,
@@ -93,7 +95,7 @@ def parse_original_path(dir_path):
 def execute_copy_files():
     for src_file_path in copy_file_list:
         relative_path = src_file_path.replace(BASE_DIR, '').lstrip('/')
-        dst_file_path = os.path.join(BASE_DIR, f'build/{project_name}', relative_path)
+        dst_file_path = os.path.join(dest_dir, relative_path)
         dir_dst_path = os.path.dirname(dst_file_path)
         if not os.path.exists(dir_dst_path):
             os.makedirs(dir_dst_path)
@@ -178,4 +180,5 @@ setup_file_path = os.path.join(dest_dir, 'setup.py')
 with open(setup_file_path, 'w') as f:
     f.write(setup_str)
 
+os.chdir(dest_dir)
 os.system('{} {} bdist_wheel --universal'.format(sys.executable, setup_file_path))
