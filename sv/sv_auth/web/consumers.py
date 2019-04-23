@@ -1,22 +1,22 @@
-from channels.layers import get_channel_layer
-
 from sv_base.extensions.websocket import Websocket
 from sv_auth.models import User
 
 
-channel_layer = get_channel_layer()
-
-
 class UserWebsocket(Websocket):
 
-    enable_auth = False
+    enable_auth = True
 
     @property
     def user(self) -> User:
-        return self.scope['user']
+        return User(id=1) or self.scope['user']
 
     def get_groups(self):
-        return [self.user_group_name(self.user)]
+        if self.enable_auth:
+            groups = [self.user_group_name(self.user)]
+        else:
+            groups = []
+
+        return groups
 
     @classmethod
     def user_group_name(cls, user):
@@ -25,7 +25,7 @@ class UserWebsocket(Websocket):
         else:
             user_id = user
 
-        return 'user-{user_id}'.format(user_id=user_id)
+        return f'user-{user_id}'
 
     @classmethod
     def user_send(cls, user, content):
@@ -35,7 +35,7 @@ class UserWebsocket(Websocket):
             users = [user]
 
         for usr in users:
-            channel_layer.group_send(cls.user_group_name(usr), content)
+            cls.group_send(cls.user_group_name(usr), content)
 
     def check_auth(self):
         if self.enable_auth and not self.user.is_authenticated:

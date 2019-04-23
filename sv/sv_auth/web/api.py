@@ -8,11 +8,10 @@ from rest_framework.response import Response
 from sv_base.utils.base.text import rk
 from sv_base.extensions.rest.mixins import CacheModelMixin, BatchSetModelMixin, DestroyModelMixin, SVMixin
 
+from sv_auth.extensions.rest.decorators import org_queryset
+from sv_auth.extensions.rest.permissions import IsAdminOrReadOnly
 from sv_auth.models import Organization, User
 from sv_auth.utils import org as org_util
-from sv_auth.utils.rest.decorators import org_queryset
-from sv_auth.utils.rest.permissions import IsAdminOrReadOnly
-
 
 from . import serializers as mserializers
 from .error import Error
