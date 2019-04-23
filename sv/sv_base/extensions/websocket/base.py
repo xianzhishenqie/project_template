@@ -46,14 +46,28 @@ class Websocket(JsonWebsocketConsumer):
         return '%s.%s' % (cls.group_prefix(), name)
 
     @classmethod
-    def get_channel_layer(cls):
+    def get_channel_layer(cls) -> object:
+        """获取channel_layer
+
+        :return: channel_layer
+        """
         return get_channel_layer(cls.channel_layer_alias)
 
-    def group_message(self, message):
+    def group_message(self, message: dict) -> None:
+        """组消息处理
+
+        :param message: 消息内容
+        """
         self.send_json(message["content"], close=message["close"])
 
     @classmethod
-    def group_send(cls, group, content, close=False):
+    def group_send(cls, group: str, content: dict, close: bool = False) -> None:
+        """组发送消息
+
+        :param group: 组名
+        :param content: 消息内容
+        :param close: 是否关闭连接
+        """
         channel_layer = cls.get_channel_layer()
         group_send = async_to_sync(channel_layer.group_send)
         group_name = cls.get_group_name(group)
