@@ -143,8 +143,7 @@ ext_modules = [
 setup(
     name=project_name,
     cmdclass={'build_ext': build_ext},
-    language_level=3,
-    ext_modules=cythonize(ext_modules, build_dir=f'build/{project_name}-build')
+    ext_modules=cythonize(ext_modules, language_level='3str', build_dir=f'build/{project_name}-build')
 )
 
 
