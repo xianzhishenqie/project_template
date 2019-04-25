@@ -20,6 +20,7 @@ from sv.settings import BASE_DIR
 
 Options.docstrings = False
 
+setup_pack = True
 
 project_name = os.path.split(BASE_DIR)[1]
 
@@ -143,16 +144,19 @@ ext_modules = [
 setup(
     name=project_name,
     cmdclass={'build_ext': build_ext},
-    ext_modules=cythonize(ext_modules, language_level='3str', build_dir=f'build/{project_name}-build')
+    ext_modules=cythonize(ext_modules, language_level='3', build_dir=f'build/{project_name}-build')
 )
 
 
-setup_str = f'''
+if setup_pack:
+    setup_str = f'''
 from setuptools import setup, find_packages
 
 setup(
     name='{project_name}',
     version='1.0',
+    python_requires=">=3.7",
+    install_requires=[],
     packages=find_packages(),
     package_data={{
         '': ['*.so', '*.po'],
@@ -171,13 +175,14 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries'
     ],
 )
 '''
-setup_file_path = os.path.join(dest_dir, 'setup.py')
-with open(setup_file_path, 'w') as f:
-    f.write(setup_str)
+    setup_file_path = os.path.join(dest_dir, 'setup.py')
+    with open(setup_file_path, 'w') as f:
+        f.write(setup_str)
 
-os.chdir(dest_dir)
-os.system('{} {} bdist_wheel --universal'.format(sys.executable, setup_file_path))
+    os.chdir(dest_dir)
+    os.system('{} {} bdist_wheel --universal'.format(sys.executable, setup_file_path))

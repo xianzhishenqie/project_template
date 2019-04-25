@@ -2,6 +2,7 @@ import logging
 import socket
 import subprocess
 import time
+import random
 import re
 
 from typing import Callable, Optional
@@ -131,3 +132,27 @@ def probe(ip: str,
                 if stop_check():
                     break
                 stop_check_time = 0
+
+
+def get_idle_port(ip: str = '0.0.0.0',
+                  start_port: int = 10000,
+                  end_port: int = 60000,
+                  max_attempt_time: int = 10) -> Optional[int]:
+    """获取空闲端口
+
+    :param ip: ip地址
+    :param start_port: 端口范围最小值
+    :param end_port: 端口范围最大值
+    :param max_attempt_time: 最大尝试次数
+    :return:
+    """
+    port = random.randint(start_port, end_port)
+
+    attempt_time = 0
+    while cport(ip, port):
+        attempt_time = attempt_time + 1
+        if attempt_time >= max_attempt_time:
+            return None
+        port = random.randint(start_port, end_port)
+
+    return port

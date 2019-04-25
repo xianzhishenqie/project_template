@@ -9,6 +9,7 @@ SERVER_PROTOCOL = 'http'
 SERVER_IP = '127.0.0.1'
 SERVER_PORT = 8077
 
+CORS_ORIGIN_WHITELIST = ()
 
 # app名称 url路径
 SV_APP_PATHS = [
