@@ -1,76 +1,84 @@
 from __future__ import annotations
 
-from typing import Union
+import copy
 
-from django.utils.encoding import force_text
+from typing import Union, Optional
 
-from sv_base.utils.base.text import ec
+from django.utils.translation import gettext, ngettext, npgettext, ngettext_lazy, npgettext_lazy
+
+from sv_base.utils.base.property import cached_property
 
 
-class Trans(str):
+class Trans:
     """
     国际化字符串类
     """
-    # 收集所有的国际化字符串
-    source = set()
-
     code = None
+    params = None
 
-    # 格式化参数
-    p = None
-
-    def __new__(cls, s: str, code: Union[int, str, None] = None) -> Trans:
+    def __init__(self, *gettext_args, gettext_func=None, code: Union[int, str, None] = None) -> Trans:
         """生成初始化实例对象
 
-        :param s: 国际化字符串
+        :param gettext_args: 国际化字符串
+        :param gettext_func: 国际化字符串方法
         :param code: 国际化字符串标识码
         :return: 实例对象
         """
-        txt = force_text(s)
-        self = super(Trans, cls).__new__(cls, txt)
-        # 国际化字符串
-        self.txt = txt
+        if not gettext_args:
+            raise Exception('Trans gettext_args cannot be empty')
+
         # 标识码
         self.code = code
-        # 收集
-        cls.source.add(self)
-        return self
+        # 国际化字符串
+        gettext_args = list(gettext_args)
+        gettext_args_len = len(gettext_args)
+        if gettext_func is None:
+            if gettext_args_len == 1:
+                gettext_func = gettext
+            elif gettext_args_len == 2:
+                gettext_func = ngettext
+            elif gettext_args_len == 3:
+                gettext_func = npgettext
+            else:
+                gettext_func = npgettext
+                gettext_args = gettext_args[0: 3]
 
-    def __call__(self, **kwargs) -> Trans:
+        self.gettext_args = gettext_args
+        self.gettext_func = gettext_func
+
+    def __call__(self, _number_key: Optional[str] = None, **kwargs) -> Trans:
         """载入格式化参数
-
+        :param _number_key: 格式化参数中代表数量的参数
         :param kwargs: 格式化参数
-        :return: self
+        :return: 带参数的新Trans对象
         """
-        self.p = kwargs
-        return self
+        new_instance = copy.deepcopy(self)
+        del new_instance.message
+        if new_instance.gettext_func in (ngettext, npgettext, ngettext_lazy, npgettext_lazy):
+            number_key = _number_key or list(kwargs.keys())[0]
+            new_instance.gettext_args.append(kwargs[number_key])
 
-    def __eq__(self, other: Trans) -> bool:
-        """通过code比较是否相等
+        new_instance.params = kwargs
 
-        :param other: 其他国际化字符串
-        :return: bool
+        return new_instance
+
+    def __str__(self):
+        return self.message
+
+    def get_message(self) -> str:
+        """获取翻译结果
+
+        :return: 翻译结果
         """
-        r = super(Trans, self).__eq__(other)
-        try:
-            return r and self.code == other.code
-        except AttributeError:
-            return r
+        message = self.gettext_func(*self.gettext_args)
+        if self.params:
+            message = message % self.params
+        return message
 
-    def __ne__(self, other: Trans) -> bool:
-        """通过code比较不相等
+    @cached_property
+    def message(self):
+        """缓存翻译结果
 
-        :param other: 其他国际化字符串
-        :return: bool
+        :return: 翻译结果
         """
-        return not self.__eq__(other)
-
-    def __hash__(self, *args, **kwargs) -> int:
-        return hash(self.txt)
-
-    def __repr__(self) -> bytes:
-        return ec('Trans(string=%r, params=%r code=%r)' % (
-            str(self),
-            self.p,
-            self.code,
-        ))
+        return self.get_message()

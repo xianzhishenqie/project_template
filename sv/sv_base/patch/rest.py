@@ -54,9 +54,14 @@ def _get_full_details(detail):
         return [_get_full_details(item) for item in detail]
     elif isinstance(detail, dict):
         return {key: _get_full_details(value) for key, value in detail.items()}
+
+    if isinstance(detail, Trans):
+        message = detail.message
+    else:
+        message = detail
+        
     return {
-        'message': detail,
-        'params': getattr(detail, 'p', None),
+        'message': message,
         'code': detail.code
     }
 
