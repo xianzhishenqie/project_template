@@ -1,0 +1,24 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "x_error"
+msgstr "服务器繁忙"
+
+msgid "x_no_permission"
+msgstr "无操作权限"
+
+msgid "x_invalid_params"
+msgstr "无效的参数"
+
+msgid "x_invalid_value"
+msgstr "参数值无效"
+
+msgid "x_duplicate_submit"
+msgstr "重复的提交"
+
+msgid "x_duplicate_request"
+msgstr "重复的请求"
+
+msgid "x_save_failed"
+msgstr "数据保存失败"

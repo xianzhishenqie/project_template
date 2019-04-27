@@ -1,0 +1,24 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "x_error"
+msgstr "Server Busy"
+
+msgid "x_no_permission"
+msgstr "No operation permission"
+
+msgid "x_invalid_params"
+msgstr "Invalid Params"
+
+msgid "x_invalid_value"
+msgstr "Invalid Value"
+
+msgid "x_duplicate_submit"
+msgstr "Duplicate Submit"
+
+msgid "x_duplicate_request"
+msgstr "Duplicate Request"
+
+msgid "x_save_failed"
+msgstr "Save Failed"

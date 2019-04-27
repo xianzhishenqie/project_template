@@ -8,13 +8,13 @@ from .trans import Trans as _
 
 
 default_errors = dict(
-    ERROR=_('服务器繁忙'),
-    NO_PERMISSION=_('无操作权限'),
-    INVALID_PARAMS=_('无效的参数'),
-    INVALID_VALUE=_('参数值无效'),
-    DUPLICATE_SUBMIT=_('重复的提交'),
-    DUPLICATE_REQUEST=_('重复的请求'),
-    SAVE_FAILED=_('数据保存失败'),
+    ERROR=_('x_error'),
+    NO_PERMISSION=_('x_no_permission'),
+    INVALID_PARAMS=_('x_invalid_params'),
+    INVALID_VALUE=_('x_invalid_value'),
+    DUPLICATE_SUBMIT=_('x_duplicate_submit'),
+    DUPLICATE_REQUEST=_('x_duplicate_request'),
+    SAVE_FAILED=_('x_save_failed'),
 )
 
 

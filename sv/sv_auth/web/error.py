@@ -4,4 +4,4 @@ from sv_base.extensions.project.trans import Trans as _
 
 
 class Error(Enum, metaclass=ErrorMeta):
-    AUTHENTICATION_FAILED = _('用户名或密码错误')
+    AUTHENTICATION_FAILED = _('x_incorrect_username_or_password')
