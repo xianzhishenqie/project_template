@@ -22,3 +22,6 @@ msgstr "重复的请求"
 
 msgid "x_save_failed"
 msgstr "数据保存失败"
+
+msgid "x_invalid_field_choice"
+msgstr "选择一个有效的选项。 %(value)s 不在可用的选项中。"

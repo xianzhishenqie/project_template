@@ -1,8 +1,9 @@
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils import timezone
-from django_enumfield import enum
 
+from sv_base.extensions.db.models import IntChoice
+from sv_base.extensions.db.fields import enum_fields
 from sv_base.extensions.db.manager import MManager
 from sv_base.extensions.resource.models import ResourceModel
 
@@ -28,14 +29,14 @@ class User(ResourceModel, AbstractUser):
     name = models.CharField(max_length=100, default='')
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, default=None)
 
-    class Group(enum.Enum):
+    class Group(IntChoice):
         ADMIN = 1
         NORMAL = 2
 
-    class Status(enum.Enum):
+    class Status(IntChoice):
         DELETE = 0
         NORMAL = 1
-    status = enum.EnumField(Status, default=Status.NORMAL)
+    status = enum_fields.IntegerEnumField(Status, default=Status.NORMAL)
     extra = models.TextField(default='')
 
     objects = MUserManager({'status': Status.DELETE})
@@ -70,11 +71,11 @@ class Owner(models.Model):
     """
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='+')
 
-    class PublicMode(enum.Enum):
+    class PublicMode(IntChoice):
         PRIVATE = 0
         INNER = 1
         OUTER = 2
-    public_mode = enum.EnumField(PublicMode, default=PublicMode.PRIVATE)
+    public_mode = enum_fields.IntegerEnumField(PublicMode, default=PublicMode.PRIVATE)
     public_operate = models.BooleanField(default=False)
 
     create_time = models.DateTimeField(default=timezone.now)

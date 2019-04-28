@@ -22,3 +22,6 @@ msgstr "Duplicate Request"
 
 msgid "x_save_failed"
 msgstr "Save Failed"
+
+msgid "x_invalid_field_choice"
+msgstr "Select a valid choice. %(value)s is not one of the available choices."

@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.sessions.models import Session
 
 from rest_framework import exceptions, filters, status, viewsets
 from rest_framework.permissions import AllowAny
@@ -17,9 +16,9 @@ from . import serializers as mserializers
 from .error import Error
 
 
-class SessionViewSet(SVMixin, viewsets.ViewSet):
-    queryset = Session.objects.all()
+class SessionViewSet(SVMixin, viewsets.GenericViewSet):
     permission_classes = (AllowAny,)
+    serializer_class = mserializers.UserSerializer
 
     def create(self, request):
         username = self.shift_data.get('username')

@@ -49,7 +49,7 @@ class SVMixin:
         serializer_class = self.get_serializer_class()
         context = self.get_serializer_context()
         kwargs['context'] = context
-        if self.query_data_fields:
+        if getattr(self, 'query_data_fields', None):
             kwargs['fields'] = self.query_data_fields
         return serializer_class(*args, **kwargs)
 

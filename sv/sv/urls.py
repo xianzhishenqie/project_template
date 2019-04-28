@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.urls import path, include
 
 from sv_base.extensions.project.app import get_sv_urls
@@ -24,5 +25,8 @@ patterns, apipatterns = get_sv_urls()
 urlpatterns = [
     path('api/', include((apipatterns, 'api')))
 ]
+
+if settings.DEBUG:
+    urlpatterns.append(path('api-auth/', include(('rest_framework.urls', 'rest_framework'))))
 
 urlpatterns += patterns

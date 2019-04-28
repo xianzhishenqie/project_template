@@ -218,11 +218,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 
-    'DEFAULT_RENDERER_CLASSES': (
+    'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         # 'rest_framework.renderers.StaticHTMLRenderer',
         # 'rest_framework.renderers.BrowsableAPIRenderer',
-    ),
+    ],
 
     'EXCEPTION_HANDLER': 'sv_base.extensions.rest.views.exception_handler',
 
@@ -238,6 +238,9 @@ REST_FRAMEWORK = {
     'TIME_FORMAT': '%H:%M:%S',
     'TIME_INPUT_FORMATS': ('%H:%M:%S',),
 }
+if DEBUG:
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].append('rest_framework.renderers.BrowsableAPIRenderer')
+
 
 SUB_MODULES = {
     'public': '',
