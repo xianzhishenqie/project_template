@@ -42,3 +42,5 @@ def monkey_patch() -> None:
     """
     migration_serializer.EnumSerializer = EnumSerializer
     migration_serializer.TypeSerializer = TypeSerializer
+
+    migration_serializer.Serializer.register(enum.Enum, EnumSerializer)

@@ -23,7 +23,7 @@ class EnumField(models.Field):
         if 'default' not in kwargs:
             kwargs['default'] = enum.default()
         self.enum = enum
-        super(EnumField, self).__init__(self, *args, **kwargs)
+        super(EnumField, self).__init__(*args, **kwargs)
 
     def contribute_to_class(
         self, cls, name, private_only=False, virtual_only=models.NOT_PROVIDED
