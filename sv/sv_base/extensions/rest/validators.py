@@ -1,3 +1,5 @@
+import functools
+
 
 def combine_validators(validators):
     """组合验证方法
@@ -42,6 +44,9 @@ class ValidatorBase(type):
                 field_name = key[len(mcs.field_validate_func_prefix):]
                 if field_name in name_field_map:
                     field = name_field_map[field_name]
+                    if hasattr(value, 'validators') and value.validators:
+                        field.validators.extend(value.validators)
+
                     if isinstance(value, list):
                         field.validators.extend(value)
                     else:
@@ -57,8 +62,48 @@ class ValidatorBase(type):
 
 class Validator(metaclass=ValidatorBase):
     """验证配置基础类
+    example:
+        from django.core.validators import ValidationError
 
+
+        def test_validate(value):
+            if not value:
+                raise ValidationError('test validate')
+
+
+        class User(Validator):
+
+            validate_username = [test_validate]
+
+            @attach_validators([test_validate])
+            def validate_name(value):
+                if not value:
+                    raise ValidationError('validate name')
+
+            def validate(serializer, attrs):
+                if not attrs.get('name'):
+                    raise ValidationError('validate')
+
+                return attrs
+
+            class Meta:
+                model = models.User
+                serializer_classes = [UserSerializer]
     """
+
     class Meta:
         model = None
         serializer_classes = []
+
+
+def attach_validators(validators):
+    def wrapper(func):
+        func.validators = validators
+
+        @functools.wraps(func)
+        def _wrapper(value):
+            return func(value)
+
+        return _wrapper
+
+    return wrapper
