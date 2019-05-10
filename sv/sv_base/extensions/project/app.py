@@ -250,6 +250,14 @@ def sync_init(app_name: str) -> None:
     if os.path.exists(resource_path):
         import_module(resource_name)
 
+    # 初始化验证
+    validator_name = '{app_name}.validators'.format(
+        app_name=app_name,
+    )
+    validator_path = os.path.join(settings.BASE_DIR, validator_name.replace('.', '/') + '.py')
+    if os.path.exists(validator_path):
+        import_module(validator_name)
+
 
 class AppConfig(DjangoAppConfig):
     """

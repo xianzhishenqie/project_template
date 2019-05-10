@@ -40,8 +40,8 @@ class UserSerializer(ModelSerializer):
             return None
 
     def update(self, instance, validated_data):
-        request = self.context['request']
-        if '_clear_groups' in request.data:
+        request = self.context.get('request')
+        if request and '_clear_groups' in request.data:
             validated_data['groups'] = []
 
         return super(UserSerializer, self).update(instance, validated_data)
