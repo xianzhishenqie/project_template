@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from django.db.models import Q, QuerySet
 
@@ -15,6 +16,9 @@ def org_level(org: Organization) -> int:
     :param org: 组织对象
     :return: 组织级别
     """
+    if not app_settings.ENABLE_ORG:
+        return 0
+
     level = 1
     while org.parent:
         level += 1
@@ -28,6 +32,9 @@ def get_org_level(user: User) -> int:
     :param user: 用户
     :return: 组织级别
     """
+    if not app_settings.ENABLE_ORG:
+        return 0
+
     if user.is_superuser:
         return 0
 
@@ -44,6 +51,9 @@ def can_add_org(operate_user: User, parent: Organization) -> bool:
     :param parent: 目标父组织
     :return: bool
     """
+    if not app_settings.ENABLE_ORG:
+        return False
+
     t_org_level = None
     if parent:
         # 操作目标组织等级
@@ -86,6 +96,9 @@ def can_operate_org(operate_user: User, org: Organization) -> bool:
     :param org: 目标组织
     :return: bool
     """
+    if not app_settings.ENABLE_ORG:
+        return False
+
     if operate_user.is_superuser:
         return True
 
@@ -112,45 +125,51 @@ def can_operate_org(operate_user: User, org: Organization) -> bool:
         return False
 
 
-def can_add_user(operate_user: User, org: Organization, group: int) -> bool:
+def can_add_user(operate_user: User, group: int, org: Optional[Organization] = None) -> bool:
     """判断用户是否能添加用户。
 
     :param operate_user: 操作用户
-    :param org: 目标组织
     :param group: 目标组
+    :param org: 目标组织
     :return: bool
     """
     if operate_user.is_superuser:
         return True
 
-    if not org or not group:
+    if not group:
         return False
 
     # 普通用户不能添加用户
     if operate_user.group != User.Group.ADMIN:
         return False
 
-    # 操作用户所属组织等级
-    o_org_level = get_org_level(operate_user)
-    # 操作目标组织等级
-    t_org_level = org_level(org)
-    o_org = operate_user.organization
-    t_org = org
+    if app_settings.ENABLE_ORG:
+        if not org:
+            return False
 
-    if o_org_level == t_org_level:
-        # 在同一组织下，只能创建普通用户
-        return o_org == t_org and group > User.Group.ADMIN
-    elif o_org_level < t_org_level:
-        t_org = t_org.parent
-        while t_org:
-            # 操作属于自己组织的组织
-            if t_org == o_org:
-                return True
+        # 操作用户所属组织等级
+        o_org_level = get_org_level(operate_user)
+        # 操作目标组织等级
+        t_org_level = org_level(org)
+        o_org = operate_user.organization
+        t_org = org
+
+        if o_org_level == t_org_level:
+            # 在同一组织下，只能创建普通用户
+            return o_org == t_org and group > User.Group.ADMIN
+        elif o_org_level < t_org_level:
             t_org = t_org.parent
+            while t_org:
+                # 操作属于自己组织的组织
+                if t_org == o_org:
+                    return True
+                t_org = t_org.parent
 
-        return False
+            return False
+        else:
+            return False
     else:
-        return False
+        return group > User.Group.ADMIN
 
 
 def can_operate_user(operate_user: User, target_user: User) -> bool:
@@ -171,26 +190,29 @@ def can_operate_user(operate_user: User, target_user: User) -> bool:
     if operate_user.group != User.Group.ADMIN:
         return False
 
-    # 操作用户所属组织等级
-    o_org_level = get_org_level(operate_user)
-    # 目标用户所属组织等级
-    t_org_level = get_org_level(target_user)
-    o_org = operate_user.organization
-    t_org = target_user.organization
+    if app_settings.ENABLE_ORG:
+        # 操作用户所属组织等级
+        o_org_level = get_org_level(operate_user)
+        # 目标用户所属组织等级
+        t_org_level = get_org_level(target_user)
+        o_org = operate_user.organization
+        t_org = target_user.organization
 
-    if o_org_level == t_org_level:
-        # 在同一组织下
-        return o_org == t_org
-    elif o_org_level < t_org_level:
-        # 判断目标用户组织是否属于操作用户组织
-        while t_org.parent:
-            if t_org.parent == o_org:
-                return True
-            t_org = t_org.parent
+        if o_org_level == t_org_level:
+            # 在同一组织下
+            return o_org == t_org
+        elif o_org_level < t_org_level:
+            # 判断目标用户组织是否属于操作用户组织
+            while t_org.parent:
+                if t_org.parent == o_org:
+                    return True
+                t_org = t_org.parent
 
-        return False
+            return False
+        else:
+            return False
     else:
-        return False
+        return True
 
 
 def _illegal_user(user: User) -> None:
@@ -206,6 +228,9 @@ def get_filter_org_params(user: User, field: str = None) -> Q:
     :param field: 组织关联字段
     :return: 查询条件
     """
+    if not app_settings.ENABLE_ORG:
+        return Q()
+
     user_org_level = get_org_level(user)
     if user_org_level == 0:
         return Q()
@@ -231,4 +256,7 @@ def filter_org_queryset(user: User, queryset: QuerySet, field: str = None) -> Qu
     :param field: 组织关联字段
     :return: 查询queryset
     """
+    if not app_settings.ENABLE_ORG:
+        return queryset
+
     return queryset.filter(get_filter_org_params(user, field))

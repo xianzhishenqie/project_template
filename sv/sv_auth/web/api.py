@@ -91,8 +91,8 @@ class UserViewSet(BatchSetModelMixin, DestroyModelMixin, CacheModelMixin, SVMixi
         validated_data = serializer.validated_data
         if not org_util.can_add_user(
                 self.request.user,
+                validated_data.get('groups'),
                 validated_data.get('organization'),
-                validated_data.get('groups')
         ):
             raise exceptions.PermissionDenied(Error.NO_PERMISSION)
 

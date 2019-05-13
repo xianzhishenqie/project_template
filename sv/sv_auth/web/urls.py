@@ -1,12 +1,18 @@
-from django.conf.urls import url
+from django.urls import path
+
+from sv_auth import app_settings
 
 from . import api
 
-viewsets = (
-    api.OrganizationViewSet,
+
+viewsets = [
     api.UserViewSet,
-)
+]
+
+if app_settings.ENABLE_ORG:
+    viewsets.append(api.OrganizationViewSet)
+
 
 apiurlpatterns = [
-    url(r'^login/$', api.SessionViewSet.as_view({'post': 'create'}), name='login'),
+    path('login/', api.SessionViewSet.as_view({'post': 'create'}), name='login'),
 ]
