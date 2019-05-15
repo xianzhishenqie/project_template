@@ -1,12 +1,10 @@
 import os
-from typing import Optional, Union, Type
 
 from django.conf import settings
 from django.db import connections
-from django.db.models import Model, QuerySet
 
 
-def close_old_connections() -> None:
+def close_old_connections():
     """清除未使用的和废弃的连接
 
     """
@@ -14,7 +12,7 @@ def close_old_connections() -> None:
         conn.close_if_unusable_or_obsolete()
 
 
-def get_obj(pk_or_obj: Union[str, int, Model, None], model: Type[Model]) -> Optional[Model]:
+def get_obj(pk_or_obj, model):
     """根据主键或对象本身获取model对象
 
     :param pk_or_obj: 主键或对象本身
@@ -32,7 +30,7 @@ def get_obj(pk_or_obj: Union[str, int, Model, None], model: Type[Model]) -> Opti
     return obj
 
 
-def clear_nouse_field_file(using_queryset: QuerySet, file_field_name: str) -> None:
+def clear_nouse_field_file(using_queryset, file_field_name):
     """清除不再使用的关联文件
 
     :param using_queryset: 使用中的数据querySet

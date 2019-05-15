@@ -1,11 +1,9 @@
-
 import functools
-from typing import Callable
 
 from sv_base.extensions.rest.request import RequestData
 
 
-def api_request_data(strict: bool = False) -> Callable:
+def api_request_data(strict=False):
     """添加自定义的请求参数对象
 
     :param strict: 严格过滤模式
@@ -21,7 +19,7 @@ def api_request_data(strict: bool = False) -> Callable:
     return wrapper
 
 
-def request_data(strict: bool = False) -> Callable:
+def request_data(strict=False):
     """添加自定义的请求参数对象
 
     :param strict: 严格过滤模式

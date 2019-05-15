@@ -1,8 +1,7 @@
 from django.conf import settings
-from django.http.request import HttpRequest
 
 
-def get_language_code(request: HttpRequest) -> str:
+def get_language_code(request):
     """获取请求的国际化语言
 
     :param request: 请求对象
@@ -11,7 +10,7 @@ def get_language_code(request: HttpRequest) -> str:
     return getattr(request, 'LANGUAGE_CODE', settings.LANGUAGE_CODE)
 
 
-def get_ip(request: HttpRequest) -> str:
+def get_ip(request):
     """获取请求的ip地址
 
     :param request: 请求对象

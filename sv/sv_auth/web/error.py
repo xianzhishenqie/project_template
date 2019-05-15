@@ -1,4 +1,5 @@
 from enum import Enum
+
 from sv_base.extensions.project.error import ErrorMeta
 from sv_base.extensions.project.trans import Trans as _
 

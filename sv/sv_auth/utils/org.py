@@ -1,16 +1,15 @@
 import logging
-from typing import Optional
 
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 
 from sv_auth import app_settings
-from sv_auth.models import Organization, User
+from sv_auth.models import User
 
 
 logger = logging.getLogger(__name__)
 
 
-def org_level(org: Organization) -> int:
+def org_level(org):
     """获取组织级别。
 
     :param org: 组织对象
@@ -26,7 +25,7 @@ def org_level(org: Organization) -> int:
     return level
 
 
-def get_org_level(user: User) -> int:
+def get_org_level(user):
     """获取用户组织级别。
 
     :param user: 用户
@@ -44,7 +43,7 @@ def get_org_level(user: User) -> int:
     return org_level(user.organization)
 
 
-def can_add_org(operate_user: User, parent: Organization) -> bool:
+def can_add_org(operate_user, parent):
     """判断用户是否能添加子组织。
 
     :param operate_user: 操作用户
@@ -89,7 +88,7 @@ def can_add_org(operate_user: User, parent: Organization) -> bool:
         return False
 
 
-def can_operate_org(operate_user: User, org: Organization) -> bool:
+def can_operate_org(operate_user, org):
     """判断用户是否能修改组织。
 
     :param operate_user: 操作用户
@@ -125,7 +124,7 @@ def can_operate_org(operate_user: User, org: Organization) -> bool:
         return False
 
 
-def can_add_user(operate_user: User, group: int, org: Optional[Organization] = None) -> bool:
+def can_add_user(operate_user, group, org=None):
     """判断用户是否能添加用户。
 
     :param operate_user: 操作用户
@@ -172,7 +171,7 @@ def can_add_user(operate_user: User, group: int, org: Optional[Organization] = N
         return group > User.Group.ADMIN
 
 
-def can_operate_user(operate_user: User, target_user: User) -> bool:
+def can_operate_user(operate_user, target_user):
     """判断用户是否能修改用户。
 
     :param operate_user: 操作用户
@@ -215,13 +214,13 @@ def can_operate_user(operate_user: User, target_user: User) -> bool:
         return True
 
 
-def _illegal_user(user: User) -> None:
+def _illegal_user(user):
     msg = 'illegal user[%s]!' % user.pk
     logger.error(msg)
     raise Exception(msg)
 
 
-def get_filter_org_params(user: User, field: str = None) -> Q:
+def get_filter_org_params(user, field=None):
     """获取基于组织的查询条件。
 
     :param user: 操作用户
@@ -248,7 +247,7 @@ def get_filter_org_params(user: User, field: str = None) -> Q:
     return params
 
 
-def filter_org_queryset(user: User, queryset: QuerySet, field: str = None) -> QuerySet:
+def filter_org_queryset(user, queryset, field=None):
     """添加基于组织的过滤查询。
 
     :param user: 操作用户

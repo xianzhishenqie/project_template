@@ -1,8 +1,4 @@
-from __future__ import annotations
-
 import copy
-
-from typing import Union, Optional
 
 from django.utils.translation import gettext, ngettext, npgettext, ngettext_lazy, npgettext_lazy
 
@@ -16,7 +12,7 @@ class Trans:
     code = None
     params = None
 
-    def __init__(self, *gettext_args, gettext_func=None, code: Union[int, str, None] = None) -> Trans:
+    def __init__(self, *gettext_args, gettext_func=None, code=None):
         """生成初始化实例对象
 
         :param gettext_args: 国际化字符串
@@ -46,7 +42,7 @@ class Trans:
         self.gettext_args = gettext_args
         self.gettext_func = gettext_func
 
-    def __call__(self, _number_key: Optional[str] = None, **kwargs) -> Trans:
+    def __call__(self, _number_key=None, **kwargs):
         """载入格式化参数
         :param _number_key: 格式化参数中代表数量的参数
         :param kwargs: 格式化参数
@@ -65,7 +61,7 @@ class Trans:
     def __str__(self):
         return self.message
 
-    def get_message(self) -> str:
+    def get_message(self):
         """获取翻译结果
 
         :return: 翻译结果

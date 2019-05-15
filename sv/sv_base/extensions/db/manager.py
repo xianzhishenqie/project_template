@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django.db import models
 
 
@@ -7,7 +5,7 @@ class MManager(models.Manager):
     """
     自定义数据模型管理器，支持默认过滤条件
     """
-    def __init__(self, iexclude: Optional[dict] = None, ifilter: Optional[dict] = None) -> None:
+    def __init__(self, iexclude=None, ifilter=None):
         """初始化
 
         :param iexclude: 排除过滤条件
@@ -17,7 +15,7 @@ class MManager(models.Manager):
         self._inner_exclude = iexclude
         self._inner_filter = ifilter
 
-    def get_queryset(self) -> models.QuerySet:
+    def get_queryset(self):
         queryset = super(MManager, self).get_queryset()
         if self._inner_exclude:
             queryset = queryset.exclude(**self._inner_exclude)

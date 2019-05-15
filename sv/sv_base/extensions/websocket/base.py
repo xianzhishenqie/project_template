@@ -14,14 +14,14 @@ class Websocket(JsonWebsocketConsumer):
 
         super().__init__(*args, **kwargs)
 
-    def get_groups(self) -> list:
+    def get_groups(self):
         """获取组列表, 子类重写
 
         :return: 组列表
         """
         return []
 
-    def get_group_names(self) -> list:
+    def get_group_names(self):
         """自动获取组名称列表
 
         :return: 组名称列表
@@ -37,7 +37,7 @@ class Websocket(JsonWebsocketConsumer):
         return '%s.%s' % (cls.__module__, cls.__name__)
 
     @classmethod
-    def get_group_name(cls, name: str) -> str:
+    def get_group_name(cls, name):
         """生成组名称
 
         :param name: 组相对名称
@@ -46,14 +46,14 @@ class Websocket(JsonWebsocketConsumer):
         return '%s.%s' % (cls.group_prefix(), name)
 
     @classmethod
-    def get_channel_layer(cls) -> object:
+    def get_channel_layer(cls):
         """获取channel_layer
 
         :return: channel_layer
         """
         return get_channel_layer(cls.channel_layer_alias)
 
-    def group_message(self, message: dict) -> None:
+    def group_message(self, message):
         """组消息处理
 
         :param message: 消息内容
@@ -61,7 +61,7 @@ class Websocket(JsonWebsocketConsumer):
         self.send_json(message["content"], close=message["close"])
 
     @classmethod
-    def group_send(cls, group: str, content: dict, close: bool = False) -> None:
+    def group_send(cls, group, content, close=False):
         """组发送消息
 
         :param group: 组名

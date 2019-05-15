@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from django.db import models
 from django.db.models.base import ModelBase
 
@@ -9,12 +7,11 @@ from sv_base.utils.base.text import rk
 resource_classes = set()
 
 
-# model 资源表元类
 class ResourceBase(ModelBase):
     """
     model 资源表元类
     """
-    def __new__(mcs, name: str, bases: tuple, attrs: dict) -> ResourceBase:
+    def __new__(mcs, name, bases, attrs):
         super_new = super(ResourceBase, mcs).__new__
 
         parents = [b for b in bases if isinstance(b, ResourceBase)]

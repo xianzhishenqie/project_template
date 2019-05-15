@@ -1,16 +1,12 @@
-from __future__ import annotations
 import json
 
 from django.conf import settings
-from django.db.models import Model, QuerySet
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.utils.module_loading import import_string
 
 from rest_framework import exceptions, mixins, status
 from rest_framework.decorators import action
-from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
 
 from sv_base.utils.base.cache import CacheProduct
 from sv_base.utils.base.text import md5
@@ -24,7 +20,7 @@ class SVMixin:
     """
     pagination_class = VueTablePagination
 
-    def initial(self, request: Request, *args, **kwargs) -> None:
+    def initial(self, request, *args, **kwargs):
         """初始化viewset request
 
         :param request: 请求对象
@@ -39,7 +35,7 @@ class SVMixin:
         self.query_data_fields = self.query_data.getlist('_fields')
         super(SVMixin, self).initial(request, *args, **kwargs)
 
-    def get_serializer(self, *args, **kwargs) -> Serializer:
+    def get_serializer(self, *args, **kwargs):
         """获取rest序列化数据对象
 
         :param args: 其他参数
@@ -84,7 +80,7 @@ class CacheModelMixin:
     pagination_class = CacheVueTablePagination
     page_cache = True
 
-    def __new__(cls, *args, **kwargs) -> CacheModelMixin:
+    def __new__(cls, *args, **kwargs):
         obj = super(CacheModelMixin, cls).__new__(cls)
         view_name = _generate_cache_view_name(cls)
         obj.cache = CacheProduct(view_name)
@@ -136,7 +132,7 @@ class CacheModelMixin:
             cache = CacheProduct(cache_view_name)
             cache.reset()
 
-    def paginate_queryset_flag(self, queryset: QuerySet) -> bool:
+    def paginate_queryset_flag(self, queryset):
         """判断是否需要进行查询
 
         :param queryset: 查询queryset
@@ -144,7 +140,7 @@ class CacheModelMixin:
         """
         return self.paginator.paginate_queryset_flag(queryset, self.request, view=self)
 
-    def list(self, request: Request, *args, **kwargs) -> list:
+    def list(self, request, *args, **kwargs):
         """批量获取数据
 
         :param request: 请求对象
@@ -168,7 +164,7 @@ class CacheModelMixin:
             data = []
         return self.get_paginated_response(data)
 
-    def _get_list_data(self, queryset: QuerySet) -> list:
+    def _get_list_data(self, queryset):
         """获取查询数据
 
         :param queryset: 查询queryset
@@ -180,7 +176,7 @@ class CacheModelMixin:
         return data
 
     @staticmethod
-    def extra_handle_list_data(data: list) -> list:
+    def extra_handle_list_data(data):
         """额外处理返回数据
 
         :param data: 返回数据
@@ -188,7 +184,7 @@ class CacheModelMixin:
         """
         return data
 
-    def perform_create(self, serializer: Serializer) -> None:
+    def perform_create(self, serializer):
         """插入数据
 
         :param serializer: 数据序列化对象
@@ -196,7 +192,7 @@ class CacheModelMixin:
         if self.sub_perform_create(serializer):
             self.clear_cache()
 
-    def perform_update(self, serializer: Serializer) -> None:
+    def perform_update(self, serializer):
         """更新数据
 
         :param serializer: 数据序列化对象
@@ -204,7 +200,7 @@ class CacheModelMixin:
         if self.sub_perform_update(serializer):
             self.clear_cache()
 
-    def perform_destroy(self, instance: Model) -> None:
+    def perform_destroy(self, instance):
         """删除数据
 
         :param instance: 数据对象
@@ -212,7 +208,7 @@ class CacheModelMixin:
         if self.sub_perform_destroy(instance):
             self.clear_cache()
 
-    def sub_perform_create(self, serializer: Serializer) -> bool:
+    def sub_perform_create(self, serializer):
         """插入数据
 
         :param serializer: 数据序列化对象
@@ -221,7 +217,7 @@ class CacheModelMixin:
         super(CacheModelMixin, self).perform_create(serializer)
         return True
 
-    def sub_perform_update(self, serializer: Serializer) -> bool:
+    def sub_perform_update(self, serializer):
         """更新数据
 
         :param serializer: 数据序列化对象
@@ -230,7 +226,7 @@ class CacheModelMixin:
         super(CacheModelMixin, self).perform_update(serializer)
         return True
 
-    def sub_perform_destroy(self, instance: Model) -> bool:
+    def sub_perform_destroy(self, instance):
         """删除数据
 
         :param instance: 数据对象
@@ -244,7 +240,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
     """
     批量删除数据混入类
     """
-    def perform_destroy(self, instance: Model) -> None:
+    def perform_destroy(self, instance):
         """删除单挑数据
 
         :param instance: 数据实例
@@ -252,7 +248,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
         if self.sub_perform_destroy(instance) and hasattr(self, 'clear_cache'):
             self.clear_cache()
 
-    def sub_perform_destroy(self, instance: Model) -> bool:
+    def sub_perform_destroy(self, instance):
         """删除单挑数据具体实现
 
         :param instance: 数据实例
@@ -262,7 +258,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
         return True
 
     @action(methods=['delete'], detail=False)
-    def batch_destroy(self, request: Request) -> Response:
+    def batch_destroy(self, request):
         """删除多条数据
 
         :param request: 请求对象
@@ -278,7 +274,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def perform_batch_destroy(self, queryset: QuerySet) -> bool:
+    def perform_batch_destroy(self, queryset):
         """删除多条数据具体实现
 
         :param queryset: 多条数据queryset
@@ -295,7 +291,7 @@ class BatchSetModelMixin:
     batch_set_fields = {}
 
     @action(methods=['patch'], detail=False)
-    def batch_set(self, request: Request) -> Response:
+    def batch_set(self, request):
         """批量设置字段通用api
 
         :param request: 请求对象
@@ -326,7 +322,7 @@ class BatchSetModelMixin:
 
         return Response(status=status.HTTP_200_OK)
 
-    def perform_batch_set(self, queryset: QuerySet, field: str, value: object) -> bool:
+    def perform_batch_set(self, queryset, field, value):
         """批量设置字段通用更新
 
         :param queryset: 更新的queryset

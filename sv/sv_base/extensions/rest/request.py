@@ -1,7 +1,4 @@
-from typing import Union, Type
-
 from django.http import QueryDict
-from rest_framework.request import Request
 
 from sv_base.utils.base.list import list_filter, value_filter
 
@@ -10,7 +7,7 @@ class DataFilter:
     """
     请求数据过滤器
     """
-    def __init__(self, data: Union[QueryDict, dict], strict: bool = False) -> None:
+    def __init__(self, data, strict=False):
         """初始化
 
         :param data: 请求数据
@@ -20,7 +17,7 @@ class DataFilter:
         self.strict = strict
         self._is_query_dict = isinstance(data, QueryDict)
 
-    def get(self, field_name: str, filter_param: type = str) -> object:
+    def get(self, field_name, filter_param=str):
         """获取有效字段值
 
         :param field_name: 字段名称
@@ -35,7 +32,7 @@ class DataFilter:
                 data = handle_bool_value(data)
         return value_filter(data, filter_param, strict=self.strict)
 
-    def getlist(self, field_name: str, filter_param: type = str) -> object:
+    def getlist(self, field_name, filter_param=str):
         """获取有效字段值
 
         :param field_name: 字段名称
@@ -55,10 +52,10 @@ class RequestData:
     请求数据封装类
     """
     def __init__(self,
-                 request: Union[Request],
-                 is_query: bool = False,
-                 data_filter_class: Type[DataFilter] = DataFilter,
-                 strict: bool = False) -> None:
+                 request,
+                 is_query=False,
+                 data_filter_class=DataFilter,
+                 strict=False):
         """请求数据初始化
 
         :param request: 请求对象
@@ -73,7 +70,7 @@ class RequestData:
             self.data = request.data if hasattr(request, 'data') else request.POST
         self.data_filter = data_filter_class(self.data, strict)
 
-    def get(self, field_name: str, filter_param: type = str) -> object:
+    def get(self, field_name, filter_param=str):
         """获取有效字段值
 
         :param field_name: 字段名称
@@ -82,7 +79,7 @@ class RequestData:
         """
         return self.data_filter.get(field_name, filter_param)
 
-    def getlist(self, field_name: str, filter_param: type = str) -> object:
+    def getlist(self, field_name, filter_param=str):
         """获取有效字段值
 
         :param field_name: 字段名称
@@ -91,7 +88,7 @@ class RequestData:
         """
         return self.data_filter.getlist(field_name, filter_param)
 
-    def remove_field(self, field_name: str) -> None:
+    def remove_field(self, field_name):
         """移除请求数据字段
 
         :param field_name: 字段名
@@ -101,11 +98,10 @@ class RequestData:
         self.data._mutable = False
 
 
-def handle_bool_value(value: object) -> object:
+def handle_bool_value(value):
     """处理bool类型的请求值
 
     :param value: 请求值
-    :return: 返回值
     """
     if isinstance(value, str):
         if value == 'true':

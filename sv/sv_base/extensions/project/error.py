@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import enum
 
 from rest_framework.exceptions import ErrorDetail
@@ -18,7 +16,7 @@ default_errors = dict(
 )
 
 
-def generate_error_code(attr_name: str) -> str:
+def generate_error_code(attr_name):
     """生成错误码。
 
     :param attr_name: 属性名称
@@ -32,7 +30,7 @@ for key, value in default_errors.items():
 
 
 class ErrorMeta(enum.EnumMeta):
-    def __new__(mcs, cls: str, bases: tuple, classdict: enum._EnumDict) -> ErrorMeta:
+    def __new__(mcs, cls, bases, classdict):
         """初始化格式错误字典
 
         :param cls: 当前类名

@@ -2,7 +2,7 @@ import qrcode
 import qrtools
 
 
-def make_qrcode(qrcode_str: str, filepath: str) -> None:
+def make_qrcode(qrcode_str, filepath):
     """生成二维码
 
     :param qrcode_str: 二维码内容
@@ -12,7 +12,7 @@ def make_qrcode(qrcode_str: str, filepath: str) -> None:
     img.save(filepath)
 
 
-def parse_qrcode(qrcode_file: object) -> str:
+def parse_qrcode(qrcode_file):
     """解析二维码
 
     :param qrcode_file: 二维码文件

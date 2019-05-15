@@ -3,7 +3,7 @@ import re
 from rest_framework.routers import DefaultRouter
 
 
-def get_default_router(viewsets: list) -> DefaultRouter:
+def get_default_router(viewsets):
     """获取默认viewsets路由
 
     :param viewsets: viewsets
@@ -19,7 +19,7 @@ def get_default_router(viewsets: list) -> DefaultRouter:
     return router
 
 
-def rest_path(viewsets: list) -> list:
+def rest_path(viewsets):
     """获取viewsets路由url
 
     :param viewsets: viewsets

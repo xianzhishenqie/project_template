@@ -1,8 +1,7 @@
 from enum import IntEnum, Enum
-from typing import Optional, Union, Type
 
 from django.db import models
-from django.db.models import Model, QuerySet, Field
+from django.db.models import Model, QuerySet
 from django.utils.module_loading import import_string
 
 from .exception import ResourceException
@@ -56,7 +55,7 @@ class FieldOption:
         RelationType.TO_MANY: False,
     }
 
-    def __init__(self, field_name: str, relation_type: Optional[str] = None, **options) -> None:
+    def __init__(self, field_name, relation_type=None, **options):
         """初始化字段配置
 
         :param field_name: 字段名称
@@ -69,7 +68,7 @@ class FieldOption:
         self.rely_on = options.get('rely_on', self.default_rely_on[self.relation_type])
         self.set = options.get('set', self.default_set)
 
-    def default_get(self, obj: Model) -> object:
+    def default_get(self, obj):
         """默认导出方法
 
         :param obj: 数据对象
@@ -82,7 +81,7 @@ class FieldOption:
         else:
             return None
 
-    def default_set(self, obj: Model, value: Union[object, list]) -> None:
+    def default_set(self, obj, value):
         """默认导入方法
 
         :param obj: 数据对象
@@ -113,7 +112,7 @@ class CheckOption:
                                                       if self.conflict_consistency_fields
                                                       else None)
 
-    def default_get_conflict(self, obj: Model) -> Optional[Model]:
+    def default_get_conflict(self, obj):
         """默认获取冲突对象
 
         :param obj: 导入对象
@@ -126,7 +125,7 @@ class CheckOption:
         else:
             return None
 
-    def default_conflict_consistency_check(self, obj: Model, conflict_obj: Model) -> bool:
+    def default_conflict_consistency_check(self, obj, conflict_obj):
         """默认的冲突一致性检查
 
         :param obj: 导入对象
@@ -143,7 +142,7 @@ class DataOption:
     """
     数据处理配置
     """
-    def __init__(self, model: Type[Model], **options) -> None:
+    def __init__(self, model, **options):
         """数据处理配置初始化
 
         :param model: 模型类
@@ -193,7 +192,7 @@ class DataOption:
         self.check = CheckOption(**options.get('check', {}))
 
     @property
-    def has_related(self) -> bool:
+    def has_related(self):
         """是否有直接关联资源
 
         :return: bool
@@ -203,7 +202,7 @@ class DataOption:
                 return True
         return False
 
-    def get_related(self, obj: Model) -> dict:
+    def get_related(self, obj):
         """获取字段对应的关联资源
 
         :param obj: 数据对象
@@ -226,7 +225,7 @@ class DataOption:
         return related
 
 
-def try_import(cls: Union[object, str]) -> object:
+def try_import(cls):
     """如果是字符串尝试import
 
     :param cls: 可能对象
@@ -237,7 +236,7 @@ def try_import(cls: Union[object, str]) -> object:
     return cls
 
 
-def get_chain_attr(obj: Model, attr_name_str: str) -> object:
+def get_chain_attr(obj, attr_name_str):
     """获取属性
 
     :param obj: 数据对象
@@ -259,7 +258,7 @@ def get_chain_attr(obj: Model, attr_name_str: str) -> object:
     return target
 
 
-def get_serializable_value(obj: Model, field: Field) -> object:
+def get_serializable_value(obj, field):
     """获取字段序列化值
 
     :param obj: 数据对象

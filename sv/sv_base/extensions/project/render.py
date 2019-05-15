@@ -1,8 +1,5 @@
 import copy
 
-from typing import Callable, Optional
-
-from django.http.request import HttpRequest
 from django.shortcuts import render
 
 
@@ -10,7 +7,7 @@ class AppRender:
     """
     app 渲染模板，用于app子模块的模板路由
     """
-    def __init__(self, module: str, template_path: Optional[str] = None) -> None:
+    def __init__(self, module, template_path=None):
         """初始化渲染器
 
         :param module: 所在模块
@@ -21,12 +18,12 @@ class AppRender:
             self.path_parts.append(template_path)
 
     def render(self,
-               request: HttpRequest,
-               template_name: str,
-               context: Optional[dict] = None,
-               content_type: Optional[str] = None,
-               status: Optional[int] = None,
-               using: Optional[str] = None) -> object:
+               request,
+               template_name,
+               context=None,
+               content_type=None,
+               status=None,
+               using=None):
         """重载渲染方法，寻找自定义模板路径
 
         :param request: 请求对象
@@ -44,7 +41,7 @@ class AppRender:
         return render(request, template_name, context, content_type, status, using)
 
 
-def get_app_render(module: str, template_path: Optional[str] = None) -> Callable:
+def get_app_render(module, template_path=None):
     """获取app对应的渲染方法
 
     :param module: 模块名称

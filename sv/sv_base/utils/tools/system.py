@@ -3,7 +3,7 @@ import re
 import psutil
 
 
-def get_pid(name: str) -> int:
+def get_pid(name):
     """获取进程pid
 
     :param name: 进程名称

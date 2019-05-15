@@ -3,7 +3,7 @@ import re
 from django.conf.urls import url
 
 
-def get_default_router(websocket_classes: list) -> list:
+def get_default_router(websocket_classes):
     """获取默认的websocket路由
 
     :param websocket_classes: websocket类
@@ -19,7 +19,7 @@ def get_default_router(websocket_classes: list) -> list:
     return routers
 
 
-def ws_path(websocket_classes: list) -> list:
+def ws_path(websocket_classes):
     """获取websocket路由
 
     :param websocket_classes: websocket类

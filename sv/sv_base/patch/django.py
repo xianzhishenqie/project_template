@@ -3,6 +3,7 @@ django补丁
 
 """
 import builtins
+import enum
 
 from django.db import models
 from django.db.migrations import serializer as migration_serializer
@@ -12,7 +13,7 @@ class EnumSerializer(migration_serializer.BaseSerializer):
     """
     migrations 解释枚举类型补丁
     """
-    def serialize(self) -> tuple:
+    def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
         v_string, v_imports = migration_serializer.serializer_factory(self.value.value).serialize()
@@ -36,7 +37,7 @@ class TypeSerializer(migration_serializer.BaseSerializer):
                 return "%s.%s" % (module, self.value.__qualname__), {"import %s" % module}
 
 
-def monkey_patch() -> None:
+def monkey_patch():
     """打补丁
 
     """

@@ -1,11 +1,8 @@
-from typing import Optional
-
 from rest_framework import exceptions
-from rest_framework.response import Response
 from rest_framework.views import exception_handler as base_exception_handler
 
 
-def exception_handler(exc: Exception, context: Optional[dict]) -> Response:
+def exception_handler(exc, context):
     """rest api异常处理
 
     :param exc: 异常

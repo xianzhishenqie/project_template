@@ -1,13 +1,9 @@
 import logging
 import math
 from collections import OrderedDict
-from typing import Optional
 
-from django.db.models import QuerySet
 from rest_framework import pagination, response
-from rest_framework.request import Request
 from rest_framework.utils.urls import replace_query_param
-from rest_framework.viewsets import ViewSet
 
 
 logger = logging.getLogger(__name__)
@@ -19,7 +15,7 @@ class CacheLimitOffsetPaginationMixin(object):
     """
     limit offset 分页查询缓存混入类
     """
-    def get_count(self, queryset: QuerySet, view: Optional[ViewSet] = None) -> int:
+    def get_count(self, queryset, view=None):
         """获取查询总数量
 
         :param queryset: 查询querySet
@@ -36,7 +32,7 @@ class CacheLimitOffsetPaginationMixin(object):
             count = self._get_count(queryset, view=view)
         return count
 
-    def get_limit(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def get_limit(self, request, view=None):
         """获取查询数量
 
         :param request: 请求对象
@@ -56,7 +52,7 @@ class CacheLimitOffsetPaginationMixin(object):
             request.query_params._mutable = False
         return limit
 
-    def get_offset(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def get_offset(self, request, view=None):
         """获取查询偏移量
 
         :param request: 请求对象
@@ -65,7 +61,7 @@ class CacheLimitOffsetPaginationMixin(object):
         """
         return self._get_offset(request, view=view)
 
-    def paginate_queryset_flag(self, queryset: QuerySet, request: Request, view: Optional[ViewSet] = None) -> bool:
+    def paginate_queryset_flag(self, queryset, request, view=None):
         """是否需要查询
 
         :param queryset: 查询queryset
@@ -91,7 +87,7 @@ class CacheLimitOffsetPaginationMixin(object):
 
         return True
 
-    def _get_count(self, queryset: QuerySet, view: Optional[ViewSet] = None) -> int:
+    def _get_count(self, queryset, view=None):
         """获取查询总数量具体实现, 子类实现
 
         :param queryset: 查询querySet
@@ -100,7 +96,7 @@ class CacheLimitOffsetPaginationMixin(object):
         """
         raise NotImplementedError('Not implemented for mixin')
 
-    def _get_limit(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def _get_limit(self, request, view=None):
         """获取查询数量具体实现, 子类实现
 
         :param request: 请求对象
@@ -109,7 +105,7 @@ class CacheLimitOffsetPaginationMixin(object):
         """
         raise NotImplementedError('Not implemented for mixin')
 
-    def _get_offset(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def _get_offset(self, request, view=None):
         """获取查询偏移量具体实现, 子类实现
 
         :param request: 请求对象
@@ -125,7 +121,7 @@ class BootstrapPagination(pagination.LimitOffsetPagination):
     """
     max_limit = 1000
 
-    def get_paginated_response(self, data: list) -> response.Response:
+    def get_paginated_response(self, data):
         """响应的该页数据
 
         :param data: 该页数据
@@ -142,7 +138,7 @@ class CacheBootstrapPagination(CacheLimitOffsetPaginationMixin, BootstrapPaginat
     bootstrap缓存数据响应
     """
 
-    def _get_count(self, queryset: QuerySet, view: Optional[ViewSet] = None) -> int:
+    def _get_count(self, queryset, view=None):
         """获取查询总数量具体实现
 
         :param queryset: 查询querySet
@@ -152,10 +148,10 @@ class CacheBootstrapPagination(CacheLimitOffsetPaginationMixin, BootstrapPaginat
         try:
             return BootstrapPagination.get_count(self, queryset)
         except Exception as e:
-            logger.error('get count error: %s', e.message)
+            logger.error('get count error: %s', e)
             return len(queryset)
 
-    def _get_limit(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def _get_limit(self, request, view=None):
         """获取查询数量具体实现
 
         :param request: 请求对象
@@ -164,7 +160,7 @@ class CacheBootstrapPagination(CacheLimitOffsetPaginationMixin, BootstrapPaginat
         """
         return BootstrapPagination.get_limit(self, request)
 
-    def _get_offset(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def _get_offset(self, request, view=None):
         """获取查询偏移量具体实现
 
         :param request: 请求对象
@@ -184,7 +180,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
 
     max_page_size = 1000
 
-    def get_page_number(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def get_page_number(self, request, view=None):
         """获取页码
 
         :param request: 请求对象
@@ -196,7 +192,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
             strict=True
         )
 
-    def get_page_size(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def get_page_size(self, request, view=None):
         """获取查询页数量
 
         :param request: 请求对象
@@ -214,7 +210,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
             strict=True,
         )
 
-    def get_limit(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def get_limit(self, request, view=None):
         """获取查询数量
 
         :param request: 请求对象
@@ -223,7 +219,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
         """
         return self.get_page_size(request, view=view)
 
-    def get_offset(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def get_offset(self, request, view=None):
         """获取查询偏移量
 
         :param request: 请求对象
@@ -234,7 +230,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
         self.limit = self.get_limit(request, view=view)
         return (self.page_number - 1) * self.limit
 
-    def get_next_link(self) -> Optional[str]:
+    def get_next_link(self):
         """获取下一页链接
 
         :return: 链接url
@@ -244,7 +240,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
         url = self.request.build_absolute_uri()
         return replace_query_param(url, self.page_query_param, self.page_number + 1)
 
-    def get_previous_link(self) -> Optional[str]:
+    def get_previous_link(self):
         """获取上一页链接
 
         :return: 链接url
@@ -254,7 +250,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
         url = self.request.build_absolute_uri()
         return replace_query_param(url, self.page_query_param, self.page_number - 1)
 
-    def get_paginated_response(self, data: list) -> response.Response:
+    def get_paginated_response(self, data):
         """响应的该页数据
 
         :param data: 该页数据
@@ -285,7 +281,7 @@ class VueTablePagination(pagination.LimitOffsetPagination):
 
 class CacheVueTablePagination(CacheLimitOffsetPaginationMixin, VueTablePagination):
 
-    def _get_count(self, queryset: QuerySet, view: Optional[ViewSet] = None) -> int:
+    def _get_count(self, queryset, view=None):
         """获取查询总数量具体实现
 
         :param queryset: 查询querySet
@@ -295,10 +291,10 @@ class CacheVueTablePagination(CacheLimitOffsetPaginationMixin, VueTablePaginatio
         try:
             return VueTablePagination.get_count(self, queryset)
         except Exception as e:
-            logger.error('get count error: %s', e.message)
+            logger.error('get count error: %s', e)
             return len(queryset)
 
-    def _get_limit(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def _get_limit(self, request, view=None):
         """获取查询数量具体实现
 
         :param request: 请求对象
@@ -307,7 +303,7 @@ class CacheVueTablePagination(CacheLimitOffsetPaginationMixin, VueTablePaginatio
         """
         return VueTablePagination.get_limit(self, request, view=view)
 
-    def _get_offset(self, request: Request, view: Optional[ViewSet] = None) -> int:
+    def _get_offset(self, request, view=None):
         """获取查询偏移量具体实现
 
         :param request: 请求对象

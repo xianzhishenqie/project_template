@@ -90,7 +90,6 @@ class Validator(metaclass=ValidatorBase):
                 model = models.User
                 serializer_classes = [UserSerializer]
     """
-
     class Meta:
         model = None
         serializer_classes = []
@@ -99,11 +98,8 @@ class Validator(metaclass=ValidatorBase):
 def attach_validators(validators):
     def wrapper(func):
         func.validators = validators
-
         @functools.wraps(func)
         def _wrapper(value):
             return func(value)
-
         return _wrapper
-
     return wrapper

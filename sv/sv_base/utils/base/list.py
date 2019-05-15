@@ -1,7 +1,5 @@
-from typing import Union
 
-
-def convert_item(type_class: type, item: object) -> object:
+def convert_item(type_class, item):
     """对元素进行类型强制转换
 
     :param type_class: 类型
@@ -11,7 +9,7 @@ def convert_item(type_class: type, item: object) -> object:
     return type_class(item)
 
 
-def type_filter(items: list, type_class: type, strict: bool = False) -> list:
+def type_filter(items, type_class, strict=False):
     """过滤转换指定类型的元素列表
 
     :param items: 元素列表
@@ -32,7 +30,7 @@ def type_filter(items: list, type_class: type, strict: bool = False) -> list:
     return converted_items
 
 
-def area_filter(items: list, area: Union[tuple, list], strict: bool = False) -> list:
+def area_filter(items, area, strict=False):
     """过滤转换出现在指定列表内的元素列表
 
     :param items: 元素列表
@@ -48,7 +46,7 @@ def area_filter(items: list, area: Union[tuple, list], strict: bool = False) -> 
     return list(set(area) & set(converted_items))
 
 
-def list_filter(items: list, param: Union[type, set, tuple, list], strict: bool = False) -> list:
+def list_filter(items, param, strict=False):
     """自动过滤转换元素列表
 
     :param items: 元素列表
@@ -65,7 +63,7 @@ def list_filter(items: list, param: Union[type, set, tuple, list], strict: bool 
         return type_filter(items, param, strict)
 
 
-def value_filter(value: object, param: Union[type, set, tuple, list], strict: bool = False) -> object:
+def value_filter(value, param, strict=False):
     """自动过滤转换元素
 
     :param value: 元素

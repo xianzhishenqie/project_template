@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from importlib import import_module
 
@@ -14,7 +13,7 @@ from sv_base.extensions.rest.routers import rest_path
 from sv_base.extensions.websocket.routers import ws_path
 
 
-def get_app_name(module_name: str) -> str:
+def get_app_name(module_name):
     """获取模块所在app名称。
 
     :param module_name: 模块名称
@@ -23,7 +22,7 @@ def get_app_name(module_name: str) -> str:
     return module_name.split('.')[0]
 
 
-def get_service_name(module_name: str) -> str:
+def get_service_name(module_name):
     """获取模块所在服务名称。
 
     :param module_name: 模块名称
@@ -32,7 +31,7 @@ def get_service_name(module_name: str) -> str:
     return module_name.split('.')[1]
 
 
-def _get_sub_path(path_name: str) -> str:
+def _get_sub_path(path_name):
     """获取子路径。
 
     :param path_name: 路径名称
@@ -44,7 +43,7 @@ def _get_sub_path(path_name: str) -> str:
         return ''
 
 
-def get_app_urls(app_name: str) -> tuple:
+def get_app_urls(app_name):
     """获取app路由
 
     :param app_name: app名称
@@ -87,7 +86,7 @@ def get_app_urls(app_name: str) -> tuple:
     return patterns, apipatterns
 
 
-def get_sv_urls() -> tuple:
+def get_sv_urls():
     """获取项目路由。
 
     :return: 普通路由, 接口路由
@@ -146,7 +145,7 @@ def get_sv_urls() -> tuple:
     return patterns, apipatterns
 
 
-def _get_sub_channel_pattern(path_name: str) -> str:
+def _get_sub_channel_pattern(path_name):
     """获取channel子路径。
 
     :param path_name: 路径名称
@@ -158,7 +157,7 @@ def _get_sub_channel_pattern(path_name: str) -> str:
         return ''
 
 
-def get_app_routers(app_name: str) -> dict:
+def get_app_routers(app_name):
     """获取app channels路由
 
     :param app_name: app名称
@@ -188,7 +187,7 @@ def get_app_routers(app_name: str) -> dict:
     return patterns
 
 
-def get_sv_routers() -> list:
+def get_sv_routers():
     """获取项目channels路由。
 
     :return: 项目channels路由列表
@@ -226,7 +225,7 @@ def get_sv_routers() -> list:
     return patterns
 
 
-def sync_init(app_name: str) -> None:
+def sync_init(app_name):
     """app初始化
 
     :param app_name: app名称
@@ -263,7 +262,7 @@ class AppConfig(DjangoAppConfig):
     """
     继承django的AppConfig，添加自定义的app初始化功能。
     """
-    def ready(self) -> None:
+    def ready(self):
         """app载入时执行。
 
         """
@@ -277,14 +276,14 @@ class LazyAppSettings(LazySettings):
 
     _app_name = None
 
-    def __init__(self, app_name: str) -> None:
+    def __init__(self, app_name):
         self._app_name = app_name
         super(LazyAppSettings, self).__init__()
 
-    def _setup(self, name: Optional[str] = None) -> None:
+    def _setup(self, name=None):
         self._wrapped = AppSettings(self._app_name)
 
-    def __setattr__(self, name: str, value: object) -> None:
+    def __setattr__(self, name, value):
         if name == '_app_name':
             self.__dict__['_app_name'] = value
         else:
@@ -302,7 +301,7 @@ class AppSettings(Settings):
     继承django的LazySettings，添加自定义的app配置初始化功能。
     """
 
-    def __init__(self, app_name: str) -> None:
+    def __init__(self, app_name):
         # 载入默认的app配置
         app_settings_module = '{app_name}.setting'.format(
             app_name=app_name,
@@ -331,7 +330,7 @@ class AppSettings(Settings):
             default_app_settings.load_related(self)
 
 
-def load_app_settings(package: str) -> LazyAppSettings:
+def load_app_settings(package):
     """载入app配置。
 
     :param package: 包名称

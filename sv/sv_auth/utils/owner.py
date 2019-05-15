@@ -1,10 +1,10 @@
-from django.db.models import Q, F, QuerySet
+from django.db.models import Q
 
 from sv_auth import app_settings
-from sv_auth.models import User, Owner
+from sv_auth.models import Owner
 
 
-def get_filter_owner_params(user: User) -> Q:
+def get_filter_owner_params(user):
     """获取基于用户的数据查询条件。
 
     :param user: 查询用户
@@ -34,7 +34,7 @@ def get_filter_owner_params(user: User) -> Q:
         return params
 
 
-def filter_owner_queryset(user: User, queryset: QuerySet) -> QuerySet:
+def filter_owner_queryset(user, queryset):
     """添加基于用户的过滤查询。
 
     :param user: 操作用户
@@ -44,7 +44,7 @@ def filter_owner_queryset(user: User, queryset: QuerySet) -> QuerySet:
     return queryset.filter(get_filter_owner_params(user))
 
 
-def get_filter_operate_params(user: User) -> Q:
+def get_filter_operate_params(user):
     """获取基于用户的数据操作查询条件。
 
     :param user: 操作用户
@@ -76,7 +76,7 @@ def get_filter_operate_params(user: User) -> Q:
         return params
 
 
-def filter_operate_queryset(user: User, queryset: QuerySet) -> QuerySet:
+def filter_operate_queryset(user, queryset):
     """添加基于用户的操作过滤查询。
 
     :param user: 操作用户
@@ -86,7 +86,7 @@ def filter_operate_queryset(user: User, queryset: QuerySet) -> QuerySet:
     return queryset.filter(get_filter_operate_params(user))
 
 
-def can_operate_obj(user: User, obj: Owner) -> bool:
+def can_operate_obj(user, obj):
     """判断用户能否操作对象
 
     :param user: 操作用户

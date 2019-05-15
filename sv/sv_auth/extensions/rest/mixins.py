@@ -1,5 +1,3 @@
-from django.db.models import QuerySet
-
 from sv_base.extensions.rest.mixins import BatchSetModelMixin
 
 from sv_auth.models import Owner
@@ -14,7 +12,7 @@ class BatchSetOwnerModelMixin(BatchSetModelMixin):
         'public_mode': Owner.PublicMode.__members__.values()
     }
 
-    def perform_batch_set(self, queryset: QuerySet, field: str, value: object) -> bool:
+    def perform_batch_set(self, queryset, field, value):
         """批量更新字段。
 
         :param queryset: 更新集

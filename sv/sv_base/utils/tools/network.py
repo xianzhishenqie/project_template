@@ -5,13 +5,11 @@ import time
 import random
 import re
 
-from typing import Callable, Optional
-
 
 logger = logging.getLogger(__name__)
 
 
-def cport(ip: str, port: int, timeout: int = 2) -> bool:
+def cport(ip, port, timeout=2):
     """检查端口是否连通
 
     :param ip: ip地址
@@ -30,7 +28,7 @@ def cport(ip: str, port: int, timeout: int = 2) -> bool:
     return result
 
 
-def ping(ip: str, timeout: int = 2, count: int = 2) -> bool:
+def ping(ip, timeout=2, count=2):
     """检查ip是否ping通
 
     :param ip: ip地址
@@ -48,7 +46,7 @@ def ping(ip: str, timeout: int = 2, count: int = 2) -> bool:
         return False
 
 
-def get_ping(ip: str) -> int:
+def get_ping(ip):
     """获取ip延迟时间
 
     :param ip: ip地址
@@ -63,16 +61,16 @@ def get_ping(ip: str) -> int:
     return delay
 
 
-def probe(ip: str,
-          port: Optional[int] = None,
-          timeout: int = 2,
-          step_time: int = 2,
-          limit_time: int = 300,
-          stop_check_len: int = 5,
-          stop_check: Optional[Callable] = None,
-          callback: Optional[Callable] = None,
-          timeout_callback: Optional[Callable] = None,
-          log_prefix: str = 'probe') -> None:
+def probe(ip,
+          port=None,
+          timeout=2,
+          step_time=2,
+          limit_time=300,
+          stop_check_len=5,
+          stop_check=None,
+          callback=None,
+          timeout_callback=None,
+          log_prefix='probe'):
     """探测地址连通状况
 
     :param ip: ip地址
@@ -134,10 +132,10 @@ def probe(ip: str,
                 stop_check_time = 0
 
 
-def get_idle_port(ip: str = '0.0.0.0',
-                  start_port: int = 10000,
-                  end_port: int = 60000,
-                  max_attempt_time: int = 10) -> Optional[int]:
+def get_idle_port(ip='0.0.0.0',
+                  start_port=10000,
+                  end_port=60000,
+                  max_attempt_time=10):
     """获取空闲端口
 
     :param ip: ip地址

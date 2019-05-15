@@ -2,8 +2,6 @@
 rest framwork补丁
 
 """
-from typing import Union
-
 from django.utils.encoding import force_text
 
 from rest_framework import exceptions
@@ -14,7 +12,7 @@ from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 from sv_base.extensions.project.trans import Trans
 
 
-def _get_error_details(data: object, default_code: Union[int, str, None] = None) -> object:
+def _get_error_details(data, default_code=None):
     """加载错误详情
 
     :param data: 错误对象
@@ -59,7 +57,7 @@ def _get_full_details(detail):
         message = detail.message
     else:
         message = detail
-        
+
     return {
         'message': message,
         'code': detail.code
@@ -86,7 +84,7 @@ def file_field_to_representation(self, value):
     return value.name
 
 
-def monkey_patch() -> None:
+def monkey_patch():
     """打补丁
 
     """

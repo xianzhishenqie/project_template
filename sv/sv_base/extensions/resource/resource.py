@@ -1,14 +1,10 @@
-from __future__ import annotations
-
 import copy
 import pickle
 import logging
 import os
 import shutil
-from typing import Type, Optional
 
 from django.conf import settings
-from django.db.models import Model, Field
 
 from sv_base.utils.base.text import md5
 from .exception import ResourceException
@@ -35,7 +31,7 @@ class ModelResource:
     p_key_pool = {}
     p_key_counter = 1
 
-    def __new__(cls, obj: Model, root_model: Type[Model]) -> ModelResource:
+    def __new__(cls, obj, root_model):
         """生成对象资源实例
 
         :param obj: 数据对象
@@ -77,7 +73,7 @@ class ModelResource:
         cls.p_key_pool = {}
         cls.p_key_counter = 1
 
-    def __init__(self, obj: Model, root_model: Type[Model]) -> None:
+    def __init__(self, obj, root_model):
         """初始化对象资源实例，实现需要防止对象重复初始化
 
         :param obj: 数据对象
@@ -113,7 +109,7 @@ class ModelResource:
         # 标识资源已初始化
         self._inited = True
 
-    def dumps(self) -> None:
+    def dumps(self):
         """序列化资源
 
         """
@@ -138,7 +134,7 @@ class ModelResource:
         # 标识资源已序列化
         self._dumped = True
 
-    def get_relation_index(self) -> dict:
+    def get_relation_index(self):
         """获取关联数据索引
 
         :return: 关联数据索引
@@ -154,7 +150,7 @@ class ModelResource:
                 relation_index[field_name] = related_resrc.p_key if related_resrc else None
         return relation_index
 
-    def get_field_serializable_value(self, field: Field) -> object:
+    def get_field_serializable_value(self, field):
         """字段序列化
 
         :param field: 字段
@@ -178,7 +174,7 @@ class ModelResource:
             value = obj.serializable_value(field.attname)
         return value
 
-    def parse_related_tree(self) -> None:
+    def parse_related_tree(self):
         """递归解析资源的关联树
 
         """
@@ -191,7 +187,7 @@ class ModelResource:
         for related_resource in self.related_resources:
             related_resource.parse_related_tree()
 
-    def get_related_resources(self) -> None:
+    def get_related_resources(self):
         """获取关联资源
 
         """
@@ -226,7 +222,7 @@ class ModelResource:
                     self.related_resources.append(sub_resource)
                     collector.append(sub_resource)
 
-    def check_circular_dependency(self, rely_chain: Optional[set] = None, checking_list: Optional[set] = None) -> None:
+    def check_circular_dependency(self, rely_chain=None, checking_list=None):
         """检查循环依赖
 
         :param rely_chain: 依赖链资源
@@ -257,7 +253,7 @@ class ModelResource:
             related_not_rely_resource.check_circular_dependency(checking_list=checking_list)
 
     @classmethod
-    def copy_files(cls, tmp_dir: str, copying_files: list) -> None:
+    def copy_files(cls, tmp_dir, copying_files):
         """复制资源关联的文件
 
         :param tmp_dir: 目标临时目录
@@ -298,7 +294,7 @@ class DataResource:
     resource_index_pool = {}
     resource_data_pool = {}
 
-    def __new__(cls, data: dict, root_model: Type[Model]) -> DataResource:
+    def __new__(cls, data, root_model):
         """生成序列化数据实例
 
         :param data: 序列化数据
@@ -323,7 +319,7 @@ class DataResource:
             resource._inited = False
         return resource
 
-    def __init__(self, data: dict, root_model: Type[Model]) -> None:
+    def __init__(self, data, root_model):
         """初始化序列化数据实例，实现需要防止对象重复初始化
 
         :param data: 序列化数据
@@ -359,7 +355,7 @@ class DataResource:
 
     # 重置资源池
     @classmethod
-    def reset(cls, resource_index_pool: dict, resource_data_pool: dict) -> None:
+    def reset(cls, resource_index_pool, resource_data_pool):
         """重置资源池
 
         :param resource_index_pool: 数据索引集合
@@ -371,7 +367,7 @@ class DataResource:
         cls.resource_data_pool = resource_data_pool
 
     @classmethod
-    def parse_model(cls, data: dict) -> Type[Model]:
+    def parse_model(cls, data):
         """解析数据表模型
 
         :param data: 数据
@@ -381,7 +377,7 @@ class DataResource:
         p_model = index['model']
         return pickle.loads(str(p_model))
 
-    def load_data(self) -> None:
+    def load_data(self):
         """载入数据，转换问数据实例
 
         """
@@ -391,7 +387,7 @@ class DataResource:
             setattr(obj, field.attname, data[field.attname])
         self.obj = obj
 
-    def load_related(self, rely_on: bool = True) -> None:
+    def load_related(self, rely_on=True):
         """载入关联数据
 
         :param rely_on: 过滤是否是依赖的数据
@@ -418,7 +414,7 @@ class DataResource:
 
             field_option.set(self.obj, related_obj)
 
-    def save(self) -> None:
+    def save(self):
         """递归资源的关系导入数据
 
         """
@@ -442,7 +438,7 @@ class DataResource:
                 related_not_rely_resource.save()
         self.load_related(rely_on=False)
 
-    def save_obj(self) -> Model:
+    def save_obj(self):
         """保存数据对象
 
         """
@@ -485,7 +481,7 @@ class DataResource:
 
         return obj
 
-    def parse_related_tree(self) -> None:
+    def parse_related_tree(self):
         """递归解析关联数据
 
         """
@@ -498,7 +494,7 @@ class DataResource:
         for related_resource in self.related_resources:
             related_resource.parse_related_tree()
 
-    def get_related_resources(self) -> None:
+    def get_related_resources(self):
         """获取关联的数据资源对象
 
         """
@@ -534,7 +530,7 @@ class DataResource:
                     self.related_resources.append(sub_resource)
                     collector.append(sub_resource)
 
-    def check_circular_dependency(self, rely_chain: Optional[set] = None, checking_list: Optional[set] = None) -> None:
+    def check_circular_dependency(self, rely_chain=None, checking_list=None):
         """检查循环依赖
 
         :param rely_chain: 依赖链资源
@@ -565,7 +561,7 @@ class DataResource:
             related_not_rely_resource.check_circular_dependency(checking_list=checking_list)
 
     @classmethod
-    def _copy_files(cls, tmp_dir: str, dest_dir: str) -> None:
+    def _copy_files(cls, tmp_dir, dest_dir):
         """复制资源文件
 
         :param tmp_dir: 临时资源存放目录
@@ -590,7 +586,7 @@ class DataResource:
                     logger.error('copy file [%s] to [%s] error: %s', src_path, dst_path, e)
 
     @classmethod
-    def copy_files(cls, tmp_dir: str) -> None:
+    def copy_files(cls, tmp_dir):
         """复制资源文件
 
         :param tmp_dir: 临时资源存放目录

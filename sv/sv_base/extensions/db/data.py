@@ -1,9 +1,7 @@
-from typing import List
-
 SUB_MODEL_DELIMITER = '__'
 
 
-def get_sub_model_data(data: dict, sub_model_names: List[str]) -> dict:
+def get_sub_model_data(data, sub_model_names):
     """获取关联子对象数据
 
     :param data: 数据

@@ -1,7 +1,6 @@
 import logging
 import os
 import subprocess
-from typing import List
 
 from sv_base.utils.base.text import rk
 
@@ -9,7 +8,7 @@ from sv_base.utils.base.text import rk
 logger = logging.getLogger(__name__)
 
 
-def get_usb_devices() -> List[str]:
+def get_usb_devices():
     """获取usb设备列表
 
     :return: usb设备列表
@@ -29,7 +28,7 @@ def get_usb_devices() -> List[str]:
     return usb_devices
 
 
-def mount_device(device: str) -> str:
+def mount_device(device):
     """挂载usb设备
 
     :param device: usb设备
@@ -44,7 +43,7 @@ def mount_device(device: str) -> str:
     return mount_path
 
 
-def umount_device(mount_path: str) -> None:
+def umount_device(mount_path):
     """卸载usb设备
 
     :param mount_path: usb设备挂载路径

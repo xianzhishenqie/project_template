@@ -2,9 +2,6 @@ import os
 
 import logging
 import paramiko
-from paramiko.sftp_client import SFTPClient
-
-from typing import Optional
 
 
 logging.getLogger('paramiko').setLevel(logging.WARNING)
@@ -15,12 +12,7 @@ class SSH:
     """
     ssh客户端
     """
-    def __init__(self,
-                 host: str,
-                 port: int,
-                 username: str,
-                 password: Optional[str] = None,
-                 key_path: Optional[str] = None) -> None:
+    def __init__(self, host, port, username, password=None, key_path=None):
         """ssh连接建立
 
         :param host: 目标地址
@@ -47,7 +39,7 @@ class SSH:
             raise e
         self.sftp = None
 
-    def exe(self, command: str, timeout: int = 15, get_pty: bool = False, environment: Optional[dict] = None) -> tuple:
+    def exe(self, command, timeout=15, get_pty=False, environment=None):
         """ssh执行命令
 
         :param command: 命令
@@ -64,7 +56,7 @@ class SSH:
             logger.error("COMMAND EXEC ERROR %s" % e)
             raise e
 
-    def upload(self, local_path: str, remote_path: str) -> None:
+    def upload(self, local_path, remote_path):
         """ssh上传文件
 
         :param local_path: 本地路径
@@ -79,7 +71,7 @@ class SSH:
             raise e
 
     @staticmethod
-    def normalize_dir_path(dir_path: str) -> str:
+    def normalize_dir_path(dir_path):
         """标准化目录
 
         :param dir_path: 目录路径
@@ -89,7 +81,7 @@ class SSH:
             dir_path = dir_path[:-1]
         return dir_path
 
-    def upload_dir(self, local_path: str, remote_path: str, preserve_perm: bool = True) -> None:
+    def upload_dir(self, local_path, remote_path, preserve_perm=True):
         """ssh上传目录
 
         :param local_path: 本地路径
@@ -131,7 +123,7 @@ class SSH:
                 if preserve_perm:
                     sftp.chmod(rem_file, os.stat(local_file).st_mode & 0o0777)
 
-    def mkdir(self, sftp: SFTPClient, remote_path: str, mode: int = 0o0777, intermediate: bool = False) -> None:
+    def mkdir(self, sftp, remote_path, mode=0o0777, intermediate=False):
         """ssh建目录
 
         :param sftp: sftp客户端
@@ -150,7 +142,7 @@ class SSH:
         else:
             sftp.mkdir(remote_path, mode=mode)
 
-    def close(self) -> None:
+    def close(self):
         """关闭客户端连接
 
         """

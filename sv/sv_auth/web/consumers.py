@@ -1,5 +1,3 @@
-from typing import Union
-
 from sv_base.extensions.websocket import Websocket
 from sv_auth.models import User
 
@@ -12,14 +10,14 @@ class UserWebsocket(Websocket):
     enable_auth = True
 
     @property
-    def user(self) -> User:
+    def user(self):
         """连接用户
 
         :return: user
         """
         return self.scope['user']
 
-    def get_groups(self) -> list:
+    def get_groups(self):
         """获取用户组
 
         :return: 用户组
@@ -32,7 +30,7 @@ class UserWebsocket(Websocket):
         return groups
 
     @classmethod
-    def user_group_name(cls, user: Union[int, str, User]) -> str:
+    def user_group_name(cls, user):
         """格式化用户组名
 
         :param user: 用户/用户id
@@ -46,7 +44,7 @@ class UserWebsocket(Websocket):
         return f'user-{user_id}'
 
     @classmethod
-    def user_send(cls, user: Union[int, str, User, list], content: dict) -> None:
+    def user_send(cls, user, content):
         """向用户推送消息
 
         :param user: 用户/用户列表
@@ -60,7 +58,7 @@ class UserWebsocket(Websocket):
         for usr in users:
             cls.group_send(cls.user_group_name(usr), content)
 
-    def check_auth(self) -> bool:
+    def check_auth(self):
         """连接鉴权
 
         :return: bool
@@ -70,7 +68,7 @@ class UserWebsocket(Websocket):
             return False
         return True
 
-    def websocket_connect(self, message: object) -> None:
+    def websocket_connect(self, message):
         """websocket连接时处理
 
         :param message: 消息体
@@ -80,7 +78,7 @@ class UserWebsocket(Websocket):
 
         super().websocket_connect(message)
 
-    def websocket_receive(self, message: object) -> None:
+    def websocket_receive(self, message):
         """websocket接收时处理
 
         :param message: 消息体
@@ -90,7 +88,7 @@ class UserWebsocket(Websocket):
 
         super().websocket_receive(message)
 
-    def websocket_disconnect(self, message: object) -> None:
+    def websocket_disconnect(self, message):
         """websocket断开时处理
 
         :param message: 消息体

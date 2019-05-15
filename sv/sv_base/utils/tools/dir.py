@@ -1,7 +1,7 @@
 import os
 
 
-def list_dir(path: str, deep: bool = False) -> list:
+def list_dir(path, deep=False):
     """目录包含子目录和文件信息
 
     :param path: 目录路径
@@ -35,7 +35,7 @@ def list_dir(path: str, deep: bool = False) -> list:
     return data
 
 
-def list_files(path: str, deep: bool = False) -> list:
+def list_files(path, deep=False):
     """目录包含的文件列表
 
     :param path: 目录路径
@@ -54,7 +54,7 @@ def list_files(path: str, deep: bool = False) -> list:
     return files
 
 
-def get_file_suffix(name: str) -> str:
+def get_file_suffix(name):
     """获取文件后缀名
 
     :param name: 文件名

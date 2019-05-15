@@ -1,6 +1,5 @@
 
-
-def get_index_data(data: dict) -> dict:
+def get_index_data(data):
     """获取json索引数据
 
     :param data: json数据
@@ -20,7 +19,7 @@ def get_index_data(data: dict) -> dict:
     }
 
 
-def parse_index_data(data: dict) -> dict:
+def parse_index_data(data):
     """解析json索引数据
 
     :param data: json索引和数据
@@ -33,7 +32,7 @@ def parse_index_data(data: dict) -> dict:
     return parsed_data
 
 
-def _convert_index_data(data: object, index_pool: dict) -> object:
+def _convert_index_data(data, index_pool):
     """转换数据为索引（只会转换最终值为数字和字符串的值）。
 
     :param data: 数据值
@@ -65,7 +64,7 @@ def _convert_index_data(data: object, index_pool: dict) -> object:
         return data
 
 
-def _parse_index_data(data: object, index_pool: dict) -> object:
+def _parse_index_data(data, index_pool):
     """转换索引为数据。
 
     :param data: 索引

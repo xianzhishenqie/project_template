@@ -25,7 +25,7 @@ class CacheProduct:
         return md5('%s:cache' % name)
 
 
-def delete_cache(cache_instance: object) -> int:
+def delete_cache(cache_instance):
     """删除该缓存
 
     :param cache_instance: 缓存实例

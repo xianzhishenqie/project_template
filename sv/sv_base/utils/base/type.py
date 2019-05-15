@@ -1,13 +1,9 @@
-from __future__ import annotations
-
-from typing import Optional
-
 
 class NameValue:
     """
     为value添加名称属性
     """
-    def __new__(cls, value: object, name: Optional[str] = None) -> NameValue:
+    def __new__(cls, value, name=None):
         obj = super(NameValue, cls).__new__(cls, value)
         obj.value = value
         obj.name = name

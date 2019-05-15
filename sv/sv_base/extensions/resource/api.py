@@ -4,9 +4,7 @@ import os
 import pyminizip
 import shutil
 import zlib
-from typing import Optional, Union
 
-from django.db.models import QuerySet
 from django.utils import timezone
 
 from sv_base import app_settings
@@ -17,7 +15,7 @@ from .exception import ResourceException
 from .execute import Dumper, Loader
 
 
-def dump_resource_data(resource_data: dict) -> str:
+def dump_resource_data(resource_data):
     """序列化资源数据
 
     :param resource_data: 资源数据
@@ -35,7 +33,7 @@ def dump_resource_data(resource_data: dict) -> str:
     return data_str
 
 
-def load_resource_data(data_str: str) -> dict:
+def load_resource_data(data_str):
     """解析资源数据
 
     :param data_str: 序列化的资源数据
@@ -47,7 +45,7 @@ def load_resource_data(data_str: str) -> dict:
     return data
 
 
-def random_filename() -> str:
+def random_filename():
     """随机文件名
 
     :return: 随机文件名
@@ -63,7 +61,7 @@ class ResourceHandler(object):
     # 资源导出的文件名
     data_file_name = 'data'
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs):
         self.dump_resource_data = kwargs.get('dump_resource_data', dump_resource_data)
         self.load_resource_data = kwargs.get('load_resource_data', load_resource_data)
 
@@ -71,7 +69,7 @@ class ResourceHandler(object):
         self.extra_import_handle = kwargs.get('extra_import_handle')
 
     @classmethod
-    def prepare_tmp_dir(cls, filename: Optional[str] = None) -> str:
+    def prepare_tmp_dir(cls, filename=None):
         """准备临时目录
 
         :param filename: 目录名称
@@ -82,7 +80,7 @@ class ResourceHandler(object):
         os.makedirs(tmp_dir)
         return tmp_dir
 
-    def dumps(self, root_objs: Union[list, QuerySet], tmp_dir: str) -> str:
+    def dumps(self, root_objs, tmp_dir):
         """导出数据
 
         :param root_objs: 根数据对象集合
@@ -96,7 +94,7 @@ class ResourceHandler(object):
 
         return data_str
 
-    def loads(self, tmp_dir: str) -> dict:
+    def loads(self, tmp_dir):
         """导入数据
 
         :param tmp_dir: 临时目录
@@ -114,7 +112,7 @@ class ResourceHandler(object):
         return data
 
     @classmethod
-    def pack_zip(cls, tmp_dir: str, password: Optional[str] = None) -> str:
+    def pack_zip(cls, tmp_dir, password=None):
         """zip导出
 
         :param tmp_dir: 临时目录
@@ -140,7 +138,7 @@ class ResourceHandler(object):
         return zip_file_path
 
     @classmethod
-    def unpack_zip(cls, zip_file_path: str, tmp_dir: str, password: Optional[str] = None) -> None:
+    def unpack_zip(cls, zip_file_path, tmp_dir, password=None):
         """解压zip文件
 
         :param zip_file_path: zip文件路径
@@ -149,8 +147,7 @@ class ResourceHandler(object):
         """
         pyminizip.uncompress(zip_file_path, password, tmp_dir, False)
 
-    def export_package(self, root_objs: Union[list, QuerySet], filename: Optional[str] = None,
-                       password: Optional[str] = None) -> str:
+    def export_package(self, root_objs, filename=None, password=None):
         """导出数据
 
         :param root_objs: 根数据对象集合
@@ -170,7 +167,7 @@ class ResourceHandler(object):
 
         return zip_file_path
 
-    def import_package(self, package_file: str, password: Optional[str] = None) -> None:
+    def import_package(self, package_file, password=None):
         """导入数据
 
         :param package_file: 数据文件

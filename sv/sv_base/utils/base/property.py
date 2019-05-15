@@ -1,9 +1,8 @@
 import functools
 import types
-from typing import Callable
 
 
-def cached_property(func: Callable) -> property:
+def cached_property(func):
     """类的缓存属性装饰器
 
     :param func: 类的属性获取方法
@@ -38,7 +37,7 @@ instance_cached_properties_name = '_cached_properties'
 instance_reset_cached_properties_name = 'reset_cached_properties'
 
 
-def add_cached_property(instance: object, name: str) -> None:
+def add_cached_property(instance, name):
     """添加缓存的属性
 
     :param instance: 实例对象
@@ -53,7 +52,7 @@ def add_cached_property(instance: object, name: str) -> None:
         setattr(instance, instance_reset_cached_properties_name, types.MethodType(reset_cached_properties, instance))
 
 
-def remove_cached_property(instance: object, name: str) -> None:
+def remove_cached_property(instance, name):
     """移除缓存的属性
 
     :param instance: 实例对象
@@ -64,7 +63,7 @@ def remove_cached_property(instance: object, name: str) -> None:
         cached_properties.remove(name)
 
 
-def reset_cached_properties(instance: object) -> None:
+def reset_cached_properties(instance):
     """移除所有缓存的属性
 
     :param instance: 实例对象

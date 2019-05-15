@@ -1,9 +1,3 @@
-from __future__ import annotations
-
-from typing import Optional, Type
-
-from django.db.models import Model
-
 from .meta import DataOption
 
 
@@ -14,7 +8,7 @@ class ResourceBase(type):
     """
     资源配置元类，添加配置选项
     """
-    def __new__(mcs, name: str, bases: tuple, attrs: dict) -> ResourceBase:
+    def __new__(mcs, name, bases, attrs):
         new_class = super(ResourceBase, mcs).__new__(mcs, name, bases, attrs)
         # 解析资源配置选项
         model = getattr(new_class, 'model', None)
@@ -37,7 +31,7 @@ class ResourceOption:
     """
     资源处理配置
     """
-    def __init__(self, cls: Type[Model], resource: Optional[ResourceBase] = None) -> None:
+    def __init__(self, cls, resource=None):
         # 初始化所有拥有资源, 只有根资源有
         self.root_own = []
         # 初始化资源配置
@@ -56,7 +50,7 @@ class ResourceOption:
             self.set_option(data_option)
 
     @classmethod
-    def generate_root_model_key(cls, root_model: Optional[Type[Model]] = None) -> str:
+    def generate_root_model_key(cls, root_model=None):
         """根资源表唯一key
 
         :param root_model: 根资源模型类
@@ -65,7 +59,7 @@ class ResourceOption:
         return root_model._meta.db_table if root_model else '_default'
 
     @classmethod
-    def generate_root_parent_model_key(cls, root_model: Type[Model], parent_model: Type[Model]) -> str:
+    def generate_root_parent_model_key(cls, root_model, parent_model):
         """父资源表唯一key
 
         :param root_model: 根资源模型类
@@ -74,7 +68,7 @@ class ResourceOption:
         """
         return '%s:%s' % (root_model._meta.db_table, parent_model._meta.db_table)
 
-    def set_option(self, data_option: DataOption) -> None:
+    def set_option(self, data_option):
         """设置数据处理配置
 
         :param data_option: 数据处理配置
@@ -82,7 +76,7 @@ class ResourceOption:
         root_model_key = self.generate_root_model_key(data_option.root_model)
         self.options[root_model_key] = data_option
 
-    def get_option(self, root_model: Optional[Model] = None) -> DataOption:
+    def get_option(self, root_model=None):
         """获取数据处理配置
 
         :param root_model: 根资源表模型
