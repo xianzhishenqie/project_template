@@ -2,8 +2,11 @@ import pickle
 
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from sv_base.utils.base.text import ec
+from sv_base.utils.base.type import NameInt
+from sv_base.extensions.db.models import IntChoice
 
 
 class Executor(models.Model):
@@ -48,3 +51,23 @@ class Executor(models.Model):
         params = executor['params']
         params.update(kwargs)
         return func(*args, **params)
+
+
+class Event(models.Model):
+    """
+    事件记录表
+    """
+    event = models.PositiveIntegerField(_('x_event'), default=0)  # 事件, 覆盖此定义
+
+    class Status(IntChoice):
+        ABNORMAL = NameInt(0, _('x_abnormal'))
+        IN_PROGRESS = NameInt(1, _('x_in_progress'))
+        OVER = NameInt(2, _('x_over'))
+
+    status = models.PositiveIntegerField(_('x_status'), choices=Status.choices())
+    progress_code = models.PositiveIntegerField(_('x_progress_code'), default=0)
+    progress_desc = models.CharField(_('x_progress_desc'), max_length=1024, blank=True, default='')
+    time = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        abstract = True

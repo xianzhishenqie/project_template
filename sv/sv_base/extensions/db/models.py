@@ -18,7 +18,11 @@ class Choice(enum.Enum):
                 items.append((val, key))
 
         if blank:
-            items.insert(0, ('', ''))
+            sampl_val = items[0][0]
+            if isinstance(sampl_val, int):
+                items.insert(0, (0, ''))
+            else:
+                items.insert(0, ('', ''))
 
         return items
 

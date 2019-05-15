@@ -23,5 +23,26 @@ msgstr "重复的请求"
 msgid "x_save_failed"
 msgstr "数据保存失败"
 
-msgid "x_invalid_field_choice"
-msgstr "选择一个有效的选项。 %(value)s 不在可用的选项中。"
+msgid "x_abnormal"
+msgstr "异常"
+
+msgid "x_in_progress"
+msgstr "进行中"
+
+msgid "x_over"
+msgstr "结束"
+
+msgid "x_event"
+msgstr "事件"
+
+msgid "x_status"
+msgstr "状态"
+
+msgid "x_progress_code"
+msgstr "进程码"
+
+msgid "x_progress_desc"
+msgstr "进程描述"
+
+msgid "x_time"
+msgstr "时间"

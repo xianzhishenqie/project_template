@@ -23,5 +23,26 @@ msgstr "Duplicate Request"
 msgid "x_save_failed"
 msgstr "Save Failed"
 
-msgid "x_invalid_field_choice"
-msgstr "Select a valid choice. %(value)s is not one of the available choices."
+msgid "x_abnormal"
+msgstr "Abnormal"
+
+msgid "x_in_progress"
+msgstr "In Progress"
+
+msgid "x_over"
+msgstr "Over"
+
+msgid "x_event"
+msgstr "Event"
+
+msgid "x_status"
+msgstr "Status"
+
+msgid "x_progress_code"
+msgstr "Progress Code"
+
+msgid "x_progress_desc"
+msgstr "Progress Description"
+
+msgid "x_time"
+msgstr "Time"
