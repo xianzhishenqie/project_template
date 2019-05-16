@@ -2,5 +2,35 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "x_incorrect_username_or_password"
+msgid "x_auth_incorrect_username_or_password"
 msgstr "用户名或密码错误"
+
+msgid "x_auth_organization"
+msgstr "组织"
+
+msgid "x_auth_organizations"
+msgstr "组织"
+
+msgid "x_auth_name"
+msgstr "名称"
+
+msgid "x_auth_logo"
+msgstr "logo"
+
+msgid "x_auth_nickname"
+msgstr "昵称"
+
+msgid "x_auth_status"
+msgstr "状态"
+
+msgid "x_auth_create_time"
+msgstr "创建时间"
+
+msgid "x_auth_modify_time"
+msgstr "修改时间"
+
+msgid "x_auth_public_mode"
+msgstr "公开模式"
+
+msgid "x_auth_public_operate"
+msgstr "公开操作"

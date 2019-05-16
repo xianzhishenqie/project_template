@@ -2,5 +2,35 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "x_incorrect_username_or_password"
+msgid "x_auth_incorrect_username_or_password"
 msgstr "Incorrect username or password"
+
+msgid "x_auth_organization"
+msgstr "organization"
+
+msgid "x_auth_organizations"
+msgstr "organizations"
+
+msgid "x_auth_name"
+msgstr "name"
+
+msgid "x_auth_logo"
+msgstr "logo"
+
+msgid "x_auth_nickname"
+msgstr "nickname"
+
+msgid "x_auth_status"
+msgstr "status"
+
+msgid "x_auth_create_time"
+msgstr "create time"
+
+msgid "x_auth_modify_time"
+msgstr "modify time"
+
+msgid "x_auth_public_mode"
+msgstr "public mode"
+
+msgid "x_auth_public_operate"
+msgstr "public operate"
