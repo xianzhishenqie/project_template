@@ -43,6 +43,3 @@ msgstr "rogress code"
 
 msgid "x_progress_desc"
 msgstr "progress description"
-
-msgid "x_time"
-msgstr "time"

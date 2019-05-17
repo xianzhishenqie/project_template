@@ -60,14 +60,12 @@ class Event(models.Model):
     event = models.PositiveIntegerField(_('x_event'), default=0)  # 事件, 覆盖此定义
 
     class Status(IntChoice):
-        ABNORMAL = NameInt(0, _('x_abnormal'))
         IN_PROGRESS = NameInt(1, _('x_in_progress'))
         OVER = NameInt(2, _('x_over'))
-
+        ABNORMAL = NameInt(3, _('x_abnormal'))
     status = models.PositiveIntegerField(_('x_status'), choices=Status.choices())
     progress_code = models.PositiveIntegerField(_('x_progress_code'), default=0)
     progress_desc = models.CharField(_('x_progress_desc'), max_length=1024, blank=True, default='')
-    time = models.DateTimeField(default=timezone.now)
 
     class Meta:
         abstract = True

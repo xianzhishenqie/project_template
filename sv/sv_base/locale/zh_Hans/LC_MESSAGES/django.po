@@ -43,6 +43,3 @@ msgstr "进程码"
 
 msgid "x_progress_desc"
 msgstr "进程描述"
-
-msgid "x_time"
-msgstr "时间"
