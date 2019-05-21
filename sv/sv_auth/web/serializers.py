@@ -23,15 +23,7 @@ class OrganizationSerializer(ModelSerializer):
 
 
 class UserSerializer(ModelSerializer):
-    rep_name = serializers.SerializerMethodField()
-    group = serializers.SerializerMethodField()
     organization_data = serializers.SerializerMethodField()
-
-    def get_rep_name(self, obj):
-        return obj.rep_name
-
-    def get_group(self, obj):
-        return obj.group
 
     def get_organization_data(self, obj):
         if obj.organization:

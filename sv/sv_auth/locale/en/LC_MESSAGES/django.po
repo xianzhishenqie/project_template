@@ -20,6 +20,9 @@ msgstr "logo"
 msgid "x_auth_nickname"
 msgstr "nickname"
 
+msgid "x_auth_fullname"
+msgstr "full name"
+
 msgid "x_auth_status"
 msgstr "status"
 
