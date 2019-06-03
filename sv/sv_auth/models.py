@@ -79,6 +79,16 @@ class Creator(models.Model):
         abstract = True
 
 
+class NoTimeCreator(models.Model):
+    """
+    用户创建的资源
+    """
+    create_user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='+')
+
+    class Meta:
+        abstract = True
+
+
 class Modifier(Creator):
     """
     用户可修改的资源

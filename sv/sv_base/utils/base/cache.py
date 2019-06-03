@@ -1,8 +1,12 @@
+import logging
 import types
 
 from django.core.cache import _create_cache
 
 from sv_base.utils.base.text import md5
+
+
+logger = logging.getLogger(__name__)
 
 
 class CacheProduct:
@@ -30,4 +34,7 @@ def delete_cache(cache_instance):
 
     :param cache_instance: 缓存实例
     """
-    return cache_instance.delete_pattern('*')
+    try:
+        return cache_instance.delete_pattern('*')
+    except Exception as e:
+        logger.error('delete cache error: %s', e)

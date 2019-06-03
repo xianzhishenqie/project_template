@@ -70,7 +70,7 @@ def _generate_cache_key(view, queryset):
 
 
 def _generate_cache_view_name(view_cls):
-    return "%s-%s" % (view_cls.__module__, view_cls.__name__)
+    return "%s.%s" % (view_cls.__module__, view_cls.__name__)
 
 
 class CacheModelMixin:
@@ -253,7 +253,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
 
         :param instance: 数据实例
         """
-        instance.status = instance.Status.DELETE
+        instance.status = instance.Status.DELETED
         instance.save()
         return True
 
@@ -279,7 +279,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
 
         :param queryset: 多条数据queryset
         """
-        if queryset.update(status=queryset.model.Status.DELETE) > 0:
+        if queryset.update(status=queryset.model.Status.DELETED) > 0:
             return True
         return False
 

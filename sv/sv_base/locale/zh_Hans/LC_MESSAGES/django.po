@@ -43,3 +43,6 @@ msgstr "进程码"
 
 msgid "x_progress_desc"
 msgstr "进程描述"
+
+msgid "x_create_time"
+msgstr "创建时间"

@@ -1,5 +1,7 @@
 import re
 
+from django.conf import settings
+
 from rest_framework.routers import DefaultRouter
 
 
@@ -10,6 +12,9 @@ def get_default_router(viewsets):
     :return: viewsets路由
     """
     router = DefaultRouter()
+    if not settings.DEBUG:
+        router.include_root_view = False
+
     for viewset in viewsets:
         names = re.findall(r'[A-Z][a-z]+', viewset.__name__)
         names = [s.lower() for s in names[:-2]]

@@ -66,6 +66,7 @@ class Event(models.Model):
     status = models.PositiveIntegerField(_('x_status'), choices=Status.choices())
     progress_code = models.PositiveIntegerField(_('x_progress_code'), default=0)
     progress_desc = models.CharField(_('x_progress_desc'), max_length=1024, blank=True, default='')
+    create_time = models.DateTimeField(_('x_create_time'), default=timezone.now)
 
     class Meta:
         abstract = True

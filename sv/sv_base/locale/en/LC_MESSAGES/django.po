@@ -39,7 +39,10 @@ msgid "x_status"
 msgstr "status"
 
 msgid "x_progress_code"
-msgstr "rogress code"
+msgstr "progress code"
 
 msgid "x_progress_desc"
 msgstr "progress description"
+
+msgid "x_create_time"
+msgstr "create time"

@@ -2,21 +2,17 @@ import copy
 
 from django.utils.translation import gettext, ngettext, npgettext, ngettext_lazy, npgettext_lazy
 
-from sv_base.utils.base.property import cached_property
-
 
 class Trans:
     """
     国际化字符串类
     """
-    code = None
-    params = None
-
-    def __init__(self, *gettext_args, gettext_func=None, code=None):
+    def __init__(self, *gettext_args, gettext_func=None, params=None, code=None):
         """生成初始化实例对象
 
         :param gettext_args: 国际化字符串
         :param gettext_func: 国际化字符串方法
+        :param params: 国际化字符串格式参数
         :param code: 国际化字符串标识码
         :return: 实例对象
         """
@@ -41,6 +37,7 @@ class Trans:
 
         self.gettext_args = gettext_args
         self.gettext_func = gettext_func
+        self.params = params
 
     def __call__(self, _number_key=None, **kwargs):
         """载入格式化参数
@@ -49,7 +46,6 @@ class Trans:
         :return: 带参数的新Trans对象
         """
         new_instance = copy.deepcopy(self)
-        del new_instance.message
         if new_instance.gettext_func in (ngettext, npgettext, ngettext_lazy, npgettext_lazy):
             number_key = _number_key or list(kwargs.keys())[0]
             new_instance.gettext_args.append(kwargs[number_key])
@@ -59,6 +55,9 @@ class Trans:
         return new_instance
 
     def __str__(self):
+        return self.message
+
+    def __json__(self):
         return self.message
 
     def get_message(self):
@@ -71,9 +70,9 @@ class Trans:
             message = message % self.params
         return message
 
-    @cached_property
+    @property
     def message(self):
-        """缓存翻译结果
+        """翻译结果
 
         :return: 翻译结果
         """
