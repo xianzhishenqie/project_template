@@ -41,6 +41,9 @@ msgstr "status"
 msgid "x_progress_code"
 msgstr "progress code"
 
+msgid "x_progress_status"
+msgstr "progress status"
+
 msgid "x_progress_desc"
 msgstr "progress description"
 

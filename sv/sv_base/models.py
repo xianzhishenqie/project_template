@@ -65,6 +65,8 @@ class Event(models.Model):
         ABNORMAL = NameInt(3, _('x_abnormal'))
     status = models.PositiveIntegerField(_('x_status'), choices=Status.choices())
     progress_code = models.PositiveIntegerField(_('x_progress_code'), default=0)
+    ProgressStatus = Status
+    progress_status = models.PositiveIntegerField(_('x_progress_status'), choices=ProgressStatus.choices())
     progress_desc = models.CharField(_('x_progress_desc'), max_length=1024, blank=True, default='')
     create_time = models.DateTimeField(_('x_create_time'), default=timezone.now)
 
