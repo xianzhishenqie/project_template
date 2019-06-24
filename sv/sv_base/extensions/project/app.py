@@ -62,9 +62,11 @@ def get_app_urls(app_name):
             app_name=app_name,
             sub_module=sub_module_name,
         )
-        urls_path = os.path.join(settings.BASE_DIR, urls_name.replace('.', '/') + '.py')
-        if os.path.exists(urls_path):
+        try:
             urls_module = import_module(urls_name)
+        except ImportError:
+            pass
+        else:
             urls_module.urlpatterns = getattr(urls_module, 'urlpatterns', [])
             urls_module.apiurlpatterns = getattr(urls_module, 'apiurlpatterns', [])
             if hasattr(urls_module, 'viewsets'):
@@ -100,10 +102,12 @@ def get_sv_urls():
         urls_name = '{app_name}.urls'.format(
             app_name=app_name,
         )
-        urls_path = os.path.join(settings.BASE_DIR, urls_name.replace('.', '/') + '.py')
-        # 收集app根目录的路由
-        if os.path.exists(urls_path):
+        try:
             urls_module = import_module(urls_name)
+        except ImportError:
+            pass
+        else:
+            # 收集app根目录的路由
             urls_module.urlpatterns = getattr(urls_module, 'urlpatterns', [])
             urls_module.apiurlpatterns = getattr(urls_module, 'apiurlpatterns', [])
             if hasattr(urls_module, 'viewsets'):
@@ -172,9 +176,11 @@ def get_app_routers(app_name):
             app_name=app_name,
             sub_module=sub_module_name,
         )
-        routers_path = os.path.join(settings.BASE_DIR, routers_name.replace('.', '/') + '.py')
-        if os.path.exists(routers_path):
+        try:
             routers_module = import_module(routers_name)
+        except ImportError:
+            pass
+        else:
             routers_module.routerpatterns = getattr(routers_module, 'routerpatterns', [])
             if hasattr(routers_module, 'websockets'):
                 routers_module.routerpatterns.extend(ws_path(routers_module.websockets))
@@ -200,9 +206,11 @@ def get_sv_routers():
         routers_name = '{app_name}.routers'.format(
             app_name=app_name,
         )
-        routers_path = os.path.join(settings.BASE_DIR, routers_name.replace('.', '/') + '.py')
-        if os.path.exists(routers_path):
+        try:
             routers_module = import_module(routers_name)
+        except ImportError:
+            pass
+        else:
             routers_module.routerpatterns = getattr(routers_module, 'routerpatterns', [])
             if hasattr(routers_module, 'websockets'):
                 routers_module.routerpatterns.append(ws_path(routers_module.websockets))

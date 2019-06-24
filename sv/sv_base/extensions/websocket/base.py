@@ -9,10 +9,9 @@ class Websocket(JsonWebsocketConsumer):
     websocket类, 添加自动组管理
     """
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if self.groups is None:
             self.groups = self.get_group_names()
-
-        super().__init__(*args, **kwargs)
 
     def get_groups(self):
         """获取组列表, 子类重写
