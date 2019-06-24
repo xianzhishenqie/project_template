@@ -41,6 +41,9 @@ msgstr "状态"
 msgid "x_progress_code"
 msgstr "进程码"
 
+msgid "x_progress_status"
+msgstr "进程状态"
+
 msgid "x_progress_desc"
 msgstr "进程描述"
 

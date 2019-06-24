@@ -1,3 +1,4 @@
+import enum
 import logging
 
 from sv_base.models import Event
@@ -15,6 +16,14 @@ class BaseEventHandler:
     target_event_model = Event
     target_event_model_field = None
 
+    class EventFlag(enum.IntEnum):
+        """
+        事件结果标志
+        """
+        ENTER_FAILED = 0
+        SUCCESS = 1
+        SAVE_FAILED = 2
+
     def __init__(self, target, enable_cache=True):
         """初始化
 
@@ -29,55 +38,61 @@ class BaseEventHandler:
 
         :param event: 事件
         :param progress_code: 事件进程码
+        :param progress_status: 进程状态
         :param progress_desc: 事件进程描述
         """
         if self.acquire_event_lock(event, progress_code):
-            event_obj = self._save_event(event, Event.Status.IN_PROGRESS, progress_code, progress_desc)
+            event_obj = self._save_event(event, Event.Status.IN_PROGRESS, progress_code,
+                                         Event.ProgressStatus.IN_PROGRESS, progress_desc)
             if event_obj:
-                return True
+                return self.EventFlag.SUCCESS
             else:
                 self.release_event_lock(event, progress_code)
-                return False
+                return self.EventFlag.SAVE_FAILED
         else:
-            return False
+            return self.EventFlag.ENTER_FAILED
 
-    def over(self, event, progress_code=0, progress_desc=''):
+    def over(self, event, progress_code=0, progress_desc='', event_status=Event.Status.OVER):
         """事件结束
 
         :param event: 事件
+        :param event: 事件状态
         :param progress_code: 事件进程码
+        :param progress_status: 进程状态
         :param progress_desc: 事件进程描述
         """
         if self.acquire_event_lock(event, progress_code):
-            event_obj = self._save_event(event, Event.Status.OVER, progress_code, progress_desc)
+            event_obj = self._save_event(event, event_status, progress_code, Event.ProgressStatus.OVER, progress_desc)
             if event_obj:
                 if self.enable_cache:
                     self.cache.reset()
-                return True
+                return self.EventFlag.SUCCESS
             else:
                 self.release_event_lock(event, progress_code)
-                return False
+                return self.EventFlag.SAVE_FAILED
         else:
-            return False
+            return self.EventFlag.ENTER_FAILED
 
     def error(self, event, progress_code=0, progress_desc=''):
         """事件出错
 
         :param event: 事件
         :param progress_code: 事件进程码
+        :param progress_status: 进程状态
         :param progress_desc: 事件进程描述
         """
         if self.acquire_event_lock(event, progress_code):
-            event_obj = self._save_event(event, Event.Status.ABNORMAL, progress_code, progress_desc)
+            event_obj = self._save_event(event, Event.Status.ABNORMAL, progress_code, Event.ProgressStatus.ABNORMAL,
+                                         progress_desc)
             if event_obj:
                 if self.enable_cache:
                     self.cache.reset()
-                return True
+                return self.EventFlag.SUCCESS
             else:
                 self.release_event_lock(event, progress_code)
-                return False
+                return self.EventFlag.SAVE_FAILED
         else:
-            return False
+            return self.EventFlag.ENTER_FAILED
 
     @cached_property
     def cache(self):
@@ -97,12 +112,13 @@ class BaseEventHandler:
         """
         return f'{self.target.pk}'
 
-    def _get_event_create_params(self, event, status, progress_code=0, progress_desc=''):
+    def _get_event_create_params(self, event, status, progress_code, progress_status, progress_desc=''):
         """获取事件创建参数
 
         :param event: 事件
         :param status: 事件状态
         :param progress_code: 进程码
+        :param progress_status: 进程状态
         :param progress_desc: 进程描述
         :return: 创建参数
         """
@@ -111,24 +127,26 @@ class BaseEventHandler:
             'event': event,
             'status': status,
             'progress_code': progress_code,
+            'progress_status': progress_status,
             'progress_desc': progress_desc,
         }
         return create_params
 
-    def _save_event(self, event, status, progress_code=0, progress_desc=''):
+    def _save_event(self, event, status, progress_code, progress_status, progress_desc=''):
         """保存事件
 
         :param event: 事件
         :param status: 事件状态
         :param progress_code: 进程码
+        :param progress_status: 进程状态
         :param progress_desc: 进程描述
         :return: 事件对象
         """
-        create_params = self._get_event_create_params(event, status, progress_code, progress_desc)
+        create_params = self._get_event_create_params(event, status, progress_code, progress_status, progress_desc)
         try:
             event_obj = self.target_event_model.objects.create(**create_params)
         except Exception as e:
-            logger.error('save event error: %s', e)
+            logger.error('save event with params[%s] error: %s', create_params, e)
             event_obj = None
         else:
             if self.enable_cache:

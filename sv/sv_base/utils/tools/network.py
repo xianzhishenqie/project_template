@@ -77,13 +77,12 @@ def probe(ip,
     :param port: 进程端口
     :param timeout: 超时时间
     :param step_time: 探测间隔时间
-    :param limit_time:
-    :param stop_check_len:
-    :param stop_check:
-    :param callback:
-    :param timeout_callback:
-    :param log_prefix:
-    :return:
+    :param limit_time: 总超时时间
+    :param stop_check_len: 停止检查间隔次数
+    :param stop_check: 停止检查
+    :param callback: 连通回调
+    :param timeout_callback: 超时回调
+    :param log_prefix: 日志前缀
     """
     # 找不到端口则ping检查
     if port:
