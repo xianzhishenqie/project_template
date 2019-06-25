@@ -1,6 +1,12 @@
 import copy
+import json
+import logging
+import pickle
 
 from django.utils.translation import gettext, ngettext, npgettext, ngettext_lazy, npgettext_lazy
+
+
+logger = logging.getLogger(__name__)
 
 
 class Trans:
@@ -77,3 +83,44 @@ class Trans:
         :return: 翻译结果
         """
         return self.get_message()
+
+    def serialize(self):
+        if self.params:
+            serialized_params = {}
+            for key, value in self.params.items():
+                serialized_params[key] = value.serialize() if isinstance(value, Trans) else value
+        else:
+            serialized_params = None
+
+        content = {
+            'gettext_func': pickle.dumps(self.gettext_func),
+            'gettext_args': self.gettext_args,
+            'params': serialized_params,
+            'code': self.code,
+        }
+
+        return content
+
+    @classmethod
+    def deserialize(cls, content):
+        gettext_func = content.get('gettext_func')
+        if gettext_func:
+            gettext_func = pickle.loads(gettext_func)
+
+        params = content.get('params')
+        if params:
+            deserialized_params = {}
+            for key, value in params.items():
+                deserialized_params[key] = cls.deserialize(value) if isinstance(value, dict) else value
+        else:
+            deserialized_params = params
+
+
+        content = Trans(
+            *content.get('gettext_args', ()),
+            gettext_func=gettext_func,
+            params=deserialized_params,
+            code=content.get('code'),
+        )
+
+        return content
