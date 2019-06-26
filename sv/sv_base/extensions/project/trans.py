@@ -1,8 +1,7 @@
 import copy
-import json
 import logging
-import pickle
 
+from django.utils.module_loading import import_string
 from django.utils.translation import gettext, ngettext, npgettext, ngettext_lazy, npgettext_lazy
 
 
@@ -93,7 +92,7 @@ class Trans:
             serialized_params = None
 
         content = {
-            'gettext_func': pickle.dumps(self.gettext_func),
+            'gettext_func': f'{self.gettext_func.__module__}.{self.gettext_func.__name__}',
             'gettext_args': self.gettext_args,
             'params': serialized_params,
             'code': self.code,
@@ -105,7 +104,7 @@ class Trans:
     def deserialize(cls, content):
         gettext_func = content.get('gettext_func')
         if gettext_func:
-            gettext_func = pickle.loads(gettext_func)
+            gettext_func = import_string(gettext_func)
 
         params = content.get('params')
         if params:

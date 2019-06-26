@@ -1,6 +1,6 @@
 import enum
 
-from sv_base.utils.base.type import NameValue
+from sv_base.utils.base.type import NameValue, NameInt, NameStr
 
 
 class Choice(enum.Enum):
@@ -31,9 +31,9 @@ class Choice(enum.Enum):
         return cls.choices()[0][0]
 
 
-class IntChoice(int, Choice):
+class IntChoice(NameInt, Choice):
     pass
 
 
-class StrChoice(str, Choice):
+class StrChoice(NameStr, Choice):
     pass

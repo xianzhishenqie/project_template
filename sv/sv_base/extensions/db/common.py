@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 from django.db import connections
+from django.db.models import Model
 
 
 def close_old_connections():
@@ -12,7 +13,7 @@ def close_old_connections():
         conn.close_if_unusable_or_obsolete()
 
 
-def get_obj(pk_or_obj, model):
+def get_obj(pk_or_obj, model=None):
     """根据主键或对象本身获取model对象
 
     :param pk_or_obj: 主键或对象本身
@@ -22,9 +23,12 @@ def get_obj(pk_or_obj, model):
     if not pk_or_obj:
         return None
 
-    if isinstance(pk_or_obj, model):
+    if isinstance(pk_or_obj, Model):
         obj = pk_or_obj
     else:
+        if not model:
+            return None
+        
         obj = model.objects.get(pk=pk_or_obj)
 
     return obj
