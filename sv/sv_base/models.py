@@ -13,9 +13,9 @@ class Executor(models.Model):
     """
     序列化执行任务 func执行函数  params执行参数 context执行上下文
     """
-    func = models.TextField()
-    params = models.TextField(default='', blank=True)
-    context = models.TextField(default='', blank=True)
+    func = models.BinaryField()
+    params = models.BinaryField(default=b'', blank=True)
+    context = models.BinaryField(default=b'', blank=True)
 
     create_time = models.DateTimeField(default=timezone.now)
 

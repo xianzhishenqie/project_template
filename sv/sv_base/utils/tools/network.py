@@ -40,7 +40,7 @@ def ping(ip, timeout=2, count=2):
         res = subprocess.check_output('ping -c %s -w %s %s' % (count, timeout, ip), shell=True)
     except Exception:
         return False
-    if res.find('icmp_'):
+    if res.find(b'icmp_'):
         return True
     else:
         return False

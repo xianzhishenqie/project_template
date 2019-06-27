@@ -12,7 +12,7 @@ def ec(t):
     :param t: 字符串
     :return: 字节
     """
-    return t.encode(settings.ENCODING)
+    return t.encode(settings.ENCODING) if isinstance(t, str) else t
 
 
 def dc(t):
@@ -21,7 +21,7 @@ def dc(t):
     :param t: 字节
     :return: 字符串
     """
-    return t.decode(settings.ENCODING)
+    return t.decode(settings.ENCODING) if isinstance(t, bytes) else t
 
 
 def md5(t):
