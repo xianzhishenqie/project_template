@@ -2,6 +2,7 @@
 python补丁
 
 """
+import enum
 import json
 
 
@@ -21,8 +22,18 @@ def jsonencoder_default(self, o):
         return _jsonencoder_default(self, o)
 
 
+@classmethod
+def enum_values(cls, return_value=True):
+    values = cls.__members__.values()
+    if return_value:
+        return [value.value for value in values]
+    else:
+        return list(values)
+
+
 def monkey_patch():
     """打补丁
 
     """
     json.JSONEncoder.default = jsonencoder_default
+    enum.Enum.values = enum_values

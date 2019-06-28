@@ -1,3 +1,9 @@
+import json
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 def get_index_data(data):
     """获取json索引数据
@@ -85,3 +91,27 @@ def _parse_index_data(data, index_pool):
         return res
     else:
         return data
+
+
+def parse_json(value, empty=None, raise_exception=False):
+    """解析json字符串的json值
+
+    :param value: json字符串
+    :param empty: 异常空值
+    :param raise_exception: 是否抛出异常
+    :return: json值
+    """
+    if isinstance(value, str):
+        if value:
+            try:
+                json_value = json.loads(value)
+            except Exception as e:
+                if raise_exception:
+                    raise e
+                json_value = empty
+        else:
+            json_value = empty
+    else:
+        json_value = value
+
+    return json_value
