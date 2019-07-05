@@ -88,15 +88,6 @@ class RequestData:
         """
         return self.data_filter.getlist(field_name, filter_param)
 
-    def remove_field(self, field_name):
-        """移除请求数据字段
-
-        :param field_name: 字段名
-        """
-        self.data._mutable = True
-        del self.data[field_name]
-        self.data._mutable = False
-
 
 def handle_bool_value(value):
     """处理bool类型的请求值
@@ -113,5 +104,20 @@ def handle_bool_value(value):
             return bool(int(value))
         except Exception:
             pass
+
+    return value
+
+
+def set_dict_data(data, name, value=None, remove=False):
+    if hasattr(data, '_mutable'):
+        data._mutable = True
+
+    if remove:
+        value = data.pop(name, None)
+    else:
+        data[name] = value
+
+    if hasattr(data, '_mutable'):
+        data._mutable = False
 
     return value

@@ -75,3 +75,31 @@ def value_filter(value, param, strict=False):
     if ret:
         return ret[0]
     return None
+
+
+def sort(data, key=None, seq=None, reverse=False):
+    """排序
+
+    :param data: 列表数据
+    :param key: 获取基准值方法
+    :param seq: 基准队列
+    :param reverse: 是否反序
+    :return: 列表本身
+    """
+    key = key or (lambda x: x)
+    if seq:
+        sort_key = lambda x: find(seq, key(x))
+    else:
+        sort_key = key
+
+    return data.sort(key=sort_key, reverse=reverse)
+
+
+def find(seq, val):
+    if not seq:
+        return -1
+
+    try:
+        return seq.index(val)
+    except:
+        return -1
