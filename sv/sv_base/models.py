@@ -60,6 +60,7 @@ class Event(models.Model):
     event = models.PositiveIntegerField(_('x_event'), default=0)  # 事件, 覆盖此定义
 
     class Status(IntChoice):
+        START = NameInt(0, _('x_start'))
         IN_PROGRESS = NameInt(1, _('x_in_progress'))
         OVER = NameInt(2, _('x_over'))
         ABNORMAL = NameInt(3, _('x_abnormal'))

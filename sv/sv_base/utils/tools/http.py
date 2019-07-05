@@ -22,7 +22,7 @@ class HttpClient(Session):
         self.base_url = base_url or ''
         self.timeout = timeout
 
-    def mpost(self, url, kwargs):
+    def mpost(self, url, **kwargs):
         """post请求
 
         :param url: 请求url
@@ -31,7 +31,7 @@ class HttpClient(Session):
         """
         return self.post(url, **self._set_request_timeout(kwargs))
 
-    def mget(self, url, kwargs):
+    def mget(self, url, **kwargs):
         """get请求
 
         :param url: 请求url
@@ -40,7 +40,7 @@ class HttpClient(Session):
         """
         return self.get(url, **self._set_request_timeout(kwargs))
 
-    def mdelete(self, url, kwargs):
+    def mdelete(self, url, **kwargs):
         """delete请求
 
         :param url: 请求url

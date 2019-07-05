@@ -26,6 +26,9 @@ msgstr "Save failed"
 msgid "x_abnormal"
 msgstr "abnormal"
 
+msgid "x_start"
+msgstr "start"
+
 msgid "x_in_progress"
 msgstr "in progress"
 

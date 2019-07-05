@@ -26,6 +26,9 @@ msgstr "数据保存失败"
 msgid "x_abnormal"
 msgstr "异常"
 
+msgid "x_start"
+msgstr "开始"
+
 msgid "x_in_progress"
 msgstr "进行中"
 

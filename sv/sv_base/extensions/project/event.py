@@ -33,16 +33,17 @@ class BaseEventHandler:
         self.target = target
         self.enable_cache = enable_cache
 
-    def progress(self, event, progress_code=0, progress_desc=''):
+    def progress(self, event, progress_code=0, progress_desc='', event_status=Event.Status.IN_PROGRESS.value):
         """事件进行中
 
         :param event: 事件
         :param progress_code: 事件进程码
         :param progress_desc: 事件进程描述
+        :param event_status: 事件状态
         """
         if self.acquire_event_lock(event, progress_code, Event.ProgressStatus.IN_PROGRESS.value):
-            event_obj = self._save_event(event, Event.Status.IN_PROGRESS.value, progress_code,
-                                         Event.ProgressStatus.IN_PROGRESS.value, progress_desc)
+            event_obj = self._save_event(event, event_status, progress_code, Event.ProgressStatus.IN_PROGRESS.value,
+                                         progress_desc)
             if event_obj:
                 return self.EventFlag.SUCCESS
             else:
@@ -51,7 +52,7 @@ class BaseEventHandler:
         else:
             return self.EventFlag.ENTER_FAILED
 
-    def over(self, event, progress_code=0, progress_desc='', event_status=Event.Status.OVER.value):
+    def over(self, event, progress_code=0, progress_desc='', event_status=Event.Status.IN_PROGRESS.value):
         """事件结束
 
         :param event: 事件
@@ -226,3 +227,140 @@ class BaseEventHandler:
             event_obj = self.target_event_model.objects.filter(**filter_params).order_by('-create_time').first()
 
         return event_obj
+
+    def get_latest_start_event_obj(self):
+        filter_params = {
+            self.target_event_model_field: self.target,
+            'event': Event.Status.START.value,
+        }
+        event_obj = self.target_event_model.objects.filter(**filter_params).order_by('-create_time').first()
+        return event_obj
+
+
+def base_execute(func, args=None, kwargs=None, skip=None, begin=None, end=None, failed=None, sync=True,
+                 check=None):
+    args = args or ()
+    kwargs = kwargs or {}
+
+    flag = check() if check else True
+    if not flag:
+        if skip:
+            skip(*args, **kwargs)
+        return False
+
+    if not sync:
+        kwargs.update({
+            '_end': end,
+            '_failed': failed,
+        })
+
+    if begin and begin(*args, **kwargs) is False:
+        return False
+
+    try:
+        func(*args, **kwargs)
+    except Exception as e:
+        failed(e)
+
+    if sync:
+        end()
+
+    return True
+
+
+def _parse_prev_events(event, prev_events):
+    if prev_events:
+        if not isinstance(prev_events, (tuple, list)):
+            prev_events = [prev_events]
+    else:
+        prev_events = []
+
+    prev_events.append({
+        'event': event,
+        'status': (Event.Status.ABNORMAL,),
+    })
+
+    events = []
+    for prev_event in prev_events:
+        if isinstance(prev_event, dict):
+            prev_status = prev_event.get('status')
+            if prev_status and not isinstance(prev_status, (tuple, list)):
+                prev_status = (prev_status,)
+            else:
+                prev_status = (Event.Status.OVER,)
+            prev_event['status'] = prev_status
+        else:
+            prev_event = {
+                'event': prev_event,
+                'status': (Event.Status.OVER,),
+            }
+        events.append(prev_event)
+
+    return events
+
+
+def _check_events(event, latest_event, latest_event_status, prev_events=None):
+    prev_events = _parse_prev_events(event, prev_events)
+    flag = False
+    for prev_event in prev_events:
+        if latest_event == prev_event['event'] and latest_event_status in prev_event['status']:
+            flag = True
+            break
+
+    return flag
+
+
+def execute_event(event, latest_event, latest_event_status, func, args=None, kwargs=None,
+                  prev_events=None, skip=None, begin=None, end=None, failed=None, sync=True, ignore_check=False):
+    """执行事件
+
+    :param event: 准备执行的事件
+    :param latest_event: 当前最新的事件
+    :param latest_event_status: 当前最新的事件状态
+    :param func: 事件函数
+    :param args: 事件函数参数
+    :param kwargs: 事件函数参数
+    :param prev_events: 可接承的事件集(这些事件中任何一个能进入准备执行的事件)
+    :param skip: 跳过回调
+    :param begin: 开始回调
+    :param end: 结束回调
+    :param failed: 失败回调
+    :param sync: 是否同步
+    :param ignore_check: 是否忽略检查
+    """
+    if ignore_check:
+        check = None
+    else:
+        def check():
+            return _check_events(event, latest_event, latest_event_status, prev_events)
+
+    return base_execute(func, args=args, kwargs=kwargs, skip=skip, begin=begin, end=end, failed=failed, sync=sync,
+                        check=check)
+
+
+def _check_event_progress(event, latest_event, latest_event_status, progress_code, latest_progress_code,
+                          latest_progress_status):
+    flag = False
+    if event == latest_event and latest_event_status != Event.Status.OVER:
+        if progress_code == latest_progress_code:
+            if latest_progress_status == Event.ProgressStatus.ABNORMAL:
+                flag = True
+        else:
+            if latest_progress_status == Event.ProgressStatus.OVER:
+                flag = True
+
+    return flag
+
+
+def execute_event_progress(event, latest_event, latest_event_status, progress_code, latest_progress_code,
+                           latest_progress_status, func, args=None, kwargs=None,
+                           skip=None, begin=None, end=None, failed=None, sync=True, ignore_check=False):
+    if ignore_check:
+        check = None
+    else:
+        def check():
+            return _check_event_progress(event, latest_event, latest_event_status, progress_code, latest_progress_code,
+                                         latest_progress_status)
+
+    return base_execute(func, args=args, kwargs=kwargs, skip=skip, begin=begin, end=end, failed=failed, sync=sync,
+                        check=check)
