@@ -1,3 +1,4 @@
+import logging
 import os
 
 from importlib import import_module
@@ -11,6 +12,9 @@ from channels.routing import URLRouter
 from sv_base.utils.base.thread import async_exe, async_exe_once
 from sv_base.extensions.rest.routers import rest_path
 from sv_base.extensions.websocket.routers import ws_path
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_app_name(module_name):
@@ -43,6 +47,18 @@ def _get_sub_path(path_name):
         return ''
 
 
+def _handle_import_error(e, module_name):
+    module_format = "No module named '{}'"
+    module_name_parts = module_name.split('.')
+    e_desc = str(e)
+    for i in range(len(module_name_parts)):
+        parent_module_name = '.'.join(module_name_parts[: i + 1])
+        if e_desc == module_format.format(parent_module_name):
+            return
+
+    logger.error('import %s error: %s', module_name, e)
+
+
 def get_app_urls(app_name):
     """获取app路由
 
@@ -64,8 +80,8 @@ def get_app_urls(app_name):
         )
         try:
             urls_module = import_module(urls_name)
-        except ImportError:
-            pass
+        except ImportError as e:
+            _handle_import_error(e, urls_name)
         else:
             urls_module.urlpatterns = getattr(urls_module, 'urlpatterns', [])
             urls_module.apiurlpatterns = getattr(urls_module, 'apiurlpatterns', [])
@@ -104,8 +120,8 @@ def get_sv_urls():
         )
         try:
             urls_module = import_module(urls_name)
-        except ImportError:
-            pass
+        except ImportError as e:
+            _handle_import_error(e, urls_name)
         else:
             # 收集app根目录的路由
             urls_module.urlpatterns = getattr(urls_module, 'urlpatterns', [])
@@ -178,8 +194,8 @@ def get_app_routers(app_name):
         )
         try:
             routers_module = import_module(routers_name)
-        except ImportError:
-            pass
+        except ImportError as e:
+            _handle_import_error(e, routers_name)
         else:
             routers_module.routerpatterns = getattr(routers_module, 'routerpatterns', [])
             if hasattr(routers_module, 'websockets'):
@@ -208,8 +224,8 @@ def get_sv_routers():
         )
         try:
             routers_module = import_module(routers_name)
-        except ImportError:
-            pass
+        except ImportError as e:
+            _handle_import_error(e, routers_name)
         else:
             routers_module.routerpatterns = getattr(routers_module, 'routerpatterns', [])
             if hasattr(routers_module, 'websockets'):

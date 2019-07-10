@@ -52,3 +52,9 @@ msgstr "进程描述"
 
 msgid "x_create_time"
 msgstr "创建时间"
+
+msgid "x_log_level"
+msgstr "等级"
+
+msgid "x_log_content"
+msgstr "内容"

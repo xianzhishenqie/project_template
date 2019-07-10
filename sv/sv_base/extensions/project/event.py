@@ -1,8 +1,11 @@
 import copy
 import enum
+import json
 import logging
 
 from sv_base.models import Event
+from sv_base.extensions.db.common import get_obj
+from sv_base.extensions.project.trans import Trans
 from sv_base.utils.base.cache import CacheProduct
 from sv_base.utils.base.property import cached_property
 
@@ -30,8 +33,39 @@ class BaseEventHandler:
         :param target: 事件作用对象
         :param enable_cache: 使能缓存检查
         """
+        target_model = getattr(self.target_event_model, self.target_event_model_field).field.related_model
+        target = get_obj(target, target_model)
         self.target = target
         self.enable_cache = enable_cache
+
+    @classmethod
+    def dump_source_content(cls, content):
+        """获取内容的Trans源信息
+
+        :param content: 内容对象 Trans对象
+        :return: 内容的Trans源信息
+        """
+        source_content = content.serialize()
+        return json.dumps(source_content)
+
+    @classmethod
+    def load_source_content(cls, source_content):
+        """载入内容的Trans源信息
+
+        :param source_content: 内容的Trans源信息
+        :return: 内容的Trans对象
+        """
+        if not source_content:
+            return source_content
+
+        try:
+            content = json.loads(source_content)
+            trans = Trans.deserialize(content)
+        except Exception as e:
+            logger.warning(f'load event source_content error: {e}')
+            trans = source_content
+
+        return trans
 
     def progress(self, event, progress_code=0, progress_desc='', event_status=Event.Status.IN_PROGRESS.value):
         """事件进行中
@@ -128,7 +162,9 @@ class BaseEventHandler:
             'status': status,
             'progress_code': progress_code,
             'progress_status': progress_status,
-            'progress_desc': progress_desc,
+            'progress_desc': progress_desc.message if isinstance(progress_desc, Trans) else progress_desc,
+            'source_progress_desc': self.dump_source_content(progress_desc) if isinstance(progress_desc,
+                                                                                          Trans) else progress_desc,
         }
         return create_params
 
@@ -216,7 +252,7 @@ class BaseEventHandler:
                 logger.error('get event from cache error: %s', e)
                 event_obj = None
             else:
-                event_obj = self.target_event_model().__dict__.update(event_data)
+                event_obj = self.target_event_model().__dict__.update(event_data) if event_data else None
         else:
             event_obj = None
 
@@ -236,6 +272,16 @@ class BaseEventHandler:
         event_obj = self.target_event_model.objects.filter(**filter_params).order_by('-create_time').first()
         return event_obj
 
+    def get_event_progress_desc(self, event):
+        if event:
+            desc = self.load_source_content(event.source_progress_desc)
+            if isinstance(desc, Trans):
+                desc = desc.message
+        else:
+            desc = None
+
+        return desc
+
 
 def base_execute(func, args=None, kwargs=None, skip=None, begin=None, end=None, failed=None, sync=True,
                  check=None):
@@ -245,7 +291,7 @@ def base_execute(func, args=None, kwargs=None, skip=None, begin=None, end=None, 
     flag = check() if check else True
     if not flag:
         if skip:
-            skip(*args, **kwargs)
+            skip()
         return False
 
     if not sync:
@@ -254,13 +300,14 @@ def base_execute(func, args=None, kwargs=None, skip=None, begin=None, end=None, 
             '_failed': failed,
         })
 
-    if begin and begin(*args, **kwargs) is False:
+    if begin and begin() is False:
         return False
 
     try:
         func(*args, **kwargs)
     except Exception as e:
         failed(e)
+        return False
 
     if sync:
         end()
@@ -268,9 +315,11 @@ def base_execute(func, args=None, kwargs=None, skip=None, begin=None, end=None, 
     return True
 
 
-def _parse_prev_events(event, prev_events):
+def parse_prev_events(event, prev_events):
     if prev_events:
-        if not isinstance(prev_events, (tuple, list)):
+        if isinstance(prev_events, (tuple, list)):
+            prev_events = list(prev_events)
+        else:
             prev_events = [prev_events]
     else:
         prev_events = []
@@ -284,8 +333,9 @@ def _parse_prev_events(event, prev_events):
     for prev_event in prev_events:
         if isinstance(prev_event, dict):
             prev_status = prev_event.get('status')
-            if prev_status and not isinstance(prev_status, (tuple, list)):
-                prev_status = (prev_status,)
+            if prev_status:
+                if not isinstance(prev_status, (tuple, list)):
+                    prev_status = (prev_status,)
             else:
                 prev_status = (Event.Status.OVER,)
             prev_event['status'] = prev_status
@@ -299,8 +349,7 @@ def _parse_prev_events(event, prev_events):
     return events
 
 
-def _check_events(event, latest_event, latest_event_status, prev_events=None):
-    prev_events = _parse_prev_events(event, prev_events)
+def check_events(event, latest_event, latest_event_status, prev_events):
     flag = False
     for prev_event in prev_events:
         if latest_event == prev_event['event'] and latest_event_status in prev_event['status']:
@@ -310,8 +359,8 @@ def _check_events(event, latest_event, latest_event_status, prev_events=None):
     return flag
 
 
-def execute_event(event, latest_event, latest_event_status, func, args=None, kwargs=None,
-                  prev_events=None, skip=None, begin=None, end=None, failed=None, sync=True, ignore_check=False):
+def execute_event(event, latest_event, latest_event_status, prev_events, func, args=None, kwargs=None,
+                  skip=None, begin=None, end=None, failed=None, sync=True, ignore_check=False):
     """执行事件
 
     :param event: 准备执行的事件
@@ -332,7 +381,7 @@ def execute_event(event, latest_event, latest_event_status, func, args=None, kwa
         check = None
     else:
         def check():
-            return _check_events(event, latest_event, latest_event_status, prev_events)
+            return check_events(event, latest_event, latest_event_status, prev_events)
 
     return base_execute(func, args=args, kwargs=kwargs, skip=skip, begin=begin, end=end, failed=failed, sync=sync,
                         check=check)

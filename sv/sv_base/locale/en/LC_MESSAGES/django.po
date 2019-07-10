@@ -52,3 +52,9 @@ msgstr "progress description"
 
 msgid "x_create_time"
 msgstr "create time"
+
+msgid "x_log_level"
+msgstr "level"
+
+msgid "x_log_content"
+msgstr "content"

@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from sv_base.utils.base.text import ec
 from sv_base.utils.base.type import NameInt
-from sv_base.extensions.db.models import IntChoice
+from sv_base.extensions.db.models import IntChoice, StrChoice
 
 
 class Executor(models.Model):
@@ -69,6 +69,26 @@ class Event(models.Model):
     ProgressStatus = Status
     progress_status = models.PositiveIntegerField(_('x_progress_status'), choices=ProgressStatus.choices())
     progress_desc = models.CharField(_('x_progress_desc'), max_length=1024, blank=True, default='')
+    source_progress_desc = models.CharField(_('x_progress_desc'), max_length=2048, blank=True, default='')
+    create_time = models.DateTimeField(_('x_create_time'), default=timezone.now)
+
+    class Meta:
+        abstract = True
+
+
+class Log(models.Model):
+    """
+    基础日志表
+    """
+    class Level(StrChoice):
+        INFO = 'INFO'
+        DEBUG = 'DEBUG'
+        WARNING = 'WARNING'
+        ERROR = 'ERROR'
+        FATAL = 'FATAL'
+    level = models.CharField(_('x_log_level'), max_length=5, default=Level.INFO.value)
+    content = models.CharField(_('x_log_content'), max_length=1024, blank=True, default='')
+    source_content = models.CharField(_('x_log_content'), max_length=2048, blank=True, default='')
     create_time = models.DateTimeField(_('x_create_time'), default=timezone.now)
 
     class Meta:

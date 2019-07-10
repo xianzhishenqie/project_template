@@ -3,15 +3,15 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from channels.generic.websocket import JsonWebsocketConsumer
 
+from sv_base.utils.base.task import SyncTaskPool
+
 
 class Websocket(JsonWebsocketConsumer):
     """
     websocket类, 添加自动组管理
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.groups is None:
-            self.groups = self.get_group_names()
+
+    sync_task_pool = SyncTaskPool()
 
     def get_groups(self):
         """获取组列表, 子类重写
@@ -75,3 +75,15 @@ class Websocket(JsonWebsocketConsumer):
             'content': content,
             'close': close,
         })
+
+    @classmethod
+    def group_send_task(cls, group, content, close=False):
+        cls.sync_task_pool.add(cls.group_send, kwargs={
+            'group': group,
+            'content': content,
+            'close': close,
+        })
+
+    def websocket_connect(self, message):
+        self.groups = self.get_group_names()
+        super().websocket_connect(message)

@@ -44,11 +44,13 @@ class UserWebsocket(Websocket):
         return f'user-{user_id}'
 
     @classmethod
-    def user_send(cls, user, content):
+    def user_send(cls, user, data, code=None, task=False):
         """向用户推送消息
 
         :param user: 用户/用户列表
-        :param content: 消息内容
+        :param data: 消息内容
+        :param code: 消息码
+        :param task: 是否作为消息任务
         """
         if isinstance(user, (list, tuple, set)):
             users = user
@@ -56,7 +58,11 @@ class UserWebsocket(Websocket):
             users = [user]
 
         for usr in users:
-            cls.group_send(cls.user_group_name(usr), content)
+            group_send = cls.group_send_task if task else cls.group_send
+            group_send(cls.user_group_name(usr), {
+                'data': data,
+                'code': code,
+            })
 
     def check_auth(self):
         """连接鉴权
