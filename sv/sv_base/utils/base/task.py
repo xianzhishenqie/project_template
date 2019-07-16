@@ -16,7 +16,7 @@ class Task:
     def __init__(self, func, args=None, kwargs=None):
         self.func = func
         self.args = args or ()
-        self.kwargs = kwargs or ()
+        self.kwargs = kwargs or {}
         self.status = TaskStatus.WAIT
 
     def execute(self):

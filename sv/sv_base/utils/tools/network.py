@@ -53,7 +53,7 @@ def get_ping(ip):
     :return: 延迟时间 ms
     """
     try:
-        p = subprocess.getoutput("ping -c 1 {}".format(ip))
+        p = subprocess.getoutput('ping -c 1 {}'.format(ip))
         pattern = re.compile(r"rtt min/avg/max/mdev = .*/(.*?)/.*/0.000 ms")
         delay = int(float(pattern.findall(p)[0]))
     except Exception:
@@ -102,8 +102,8 @@ def probe(ip,
     all_time = 0
 
     while True:
-        logger.info('[%s] %s check %s: %ss' % (log_prefix, checker.__name__, dst_info, all_time))
         enter_time = time.time()
+        logger.info('[%s] %s check %s: %ss' % (log_prefix, checker.__name__, dst_info, all_time))
         if checker(*args):
             logger.info('[%s] %s check %s ok' % (log_prefix, checker.__name__, dst_info))
             if callback:
