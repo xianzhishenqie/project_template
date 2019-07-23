@@ -78,7 +78,7 @@ class Websocket(JsonWebsocketConsumer):
 
     @classmethod
     def group_send_task(cls, group, content, close=False):
-        cls.sync_task_pool.add(cls.group_send, kwargs={
+        cls.sync_task_pool.exe(cls.group_send, kwargs={
             'group': group,
             'content': content,
             'close': close,
