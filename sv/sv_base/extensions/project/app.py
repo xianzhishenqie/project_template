@@ -1,5 +1,4 @@
 import logging
-import os
 
 from importlib import import_module
 
@@ -269,17 +268,19 @@ def sync_init(app_name):
     resource_name = '{app_name}.resources'.format(
         app_name=app_name,
     )
-    resource_path = os.path.join(settings.BASE_DIR, resource_name.replace('.', '/') + '.py')
-    if os.path.exists(resource_path):
+    try:
         import_module(resource_name)
+    except ImportError as e:
+        _handle_import_error(e, resource_name)
 
     # 初始化验证
     validator_name = '{app_name}.validators'.format(
         app_name=app_name,
     )
-    validator_path = os.path.join(settings.BASE_DIR, validator_name.replace('.', '/') + '.py')
-    if os.path.exists(validator_path):
+    try:
         import_module(validator_name)
+    except ImportError as e:
+        _handle_import_error(e, validator_name)
 
 
 class AppConfig(DjangoAppConfig):

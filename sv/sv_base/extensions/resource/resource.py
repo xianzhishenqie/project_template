@@ -1,5 +1,4 @@
 import copy
-import pickle
 import logging
 import os
 import shutil
@@ -8,7 +7,7 @@ from django.conf import settings
 
 from sv_base.utils.base.text import md5
 from .exception import ResourceException
-from .meta import ResolveConflictType, RelationType, convert_string_fields, file_fields
+from .meta import ResolveConflictType, RelationType, convert_string_fields, file_fields, try_import
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +38,7 @@ class ModelResource:
         :return: 对象资源实例
         """
         # 序列化数据对象模型类
-        p_model = pickle.dumps(obj._meta.model)
+        p_model = pdumps(obj._meta.model)
         # 根据模型类和主键生成资源唯一标识
         resource_key = md5('%s:%s' % (p_model, obj.pk))
         # 资源池已有资源直接返回不再新建
@@ -47,7 +46,7 @@ class ModelResource:
             p_key = cls.p_key_pool[resource_key]
             resource = cls.resource_pool[p_key]
         else:
-            resource = super(ModelResource, cls).__new__(cls, obj, root_model)
+            resource = super(ModelResource, cls).__new__(cls)
             # 新建的资源加入资源池和资源表
             p_key = str(cls.p_key_counter)
             cls.p_key_counter += 1
@@ -118,7 +117,7 @@ class ModelResource:
             return
 
         # 初始化序列化数据的索引
-        data = {index_key:  {
+        data = {index_key: {
             'model': self.p_model,
             'key': self.p_key,
         }}
@@ -235,8 +234,8 @@ class ModelResource:
             if not rely_chain and self.p_key in checking_list:
                 return
         else:
-            checking_list = set()
-        checking_list.add(self.p_key)
+            checking_list = []
+        checking_list.append(self.p_key)
 
         if rely_chain and self in rely_chain:
             raise ResourceException('resource[%s] rely on self' % self.obj.__dict__)
@@ -307,7 +306,7 @@ class DataResource:
         if p_key in cls.resource_pool:
             resource = cls.resource_pool[p_key]
         else:
-            resource = super(DataResource, cls).__new__(cls, data, root_model)
+            resource = super(DataResource, cls).__new__(cls)
             # 新建的资源加入资源池和资源表
             cls.resource_pool[p_key] = resource
             cls.model_resources.setdefault(index['model'], []).append(resource)
@@ -329,7 +328,7 @@ class DataResource:
             return
 
         self.data = data
-        self.model = pickle.loads(str(self.p_model))
+        self.model = ploads(str(self.p_model))
 
         # 初始化对象关联属性
         self.root_own = self.model._resource_meta.root_own
@@ -375,7 +374,7 @@ class DataResource:
         """
         index = data[index_key]
         p_model = index['model']
-        return pickle.loads(str(p_model))
+        return ploads(str(p_model))
 
     def load_data(self):
         """载入数据，转换问数据实例
@@ -543,8 +542,8 @@ class DataResource:
             if not rely_chain and self.p_key in checking_list:
                 return
         else:
-            checking_list = set()
-        checking_list.add(self.p_key)
+            checking_list = []
+        checking_list.append(self.p_key)
 
         if rely_chain and self in rely_chain:
             raise ResourceException('resource[%s] rely on self' % self.data)
@@ -596,3 +595,11 @@ class DataResource:
 
         tmp_root_dir = os.path.join(tmp_dir, root_file_dir_name)
         cls._copy_files(tmp_root_dir, '/')
+
+
+def pdumps(obj):
+    return f'{obj.__module__}.{obj.__name__}'
+
+
+def ploads(obj_str):
+    return try_import(obj_str)

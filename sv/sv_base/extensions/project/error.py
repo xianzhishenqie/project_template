@@ -51,3 +51,8 @@ def stack_error(auto_log=True):
         logger.error(message)
 
     return message
+
+
+
+class Error(Enum, metaclass=ErrorMeta):
+    pass

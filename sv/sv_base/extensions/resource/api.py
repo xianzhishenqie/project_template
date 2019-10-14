@@ -8,7 +8,7 @@ import zlib
 from django.utils import timezone
 
 from sv_base import app_settings
-from sv_base.utils.base.text import rk
+from sv_base.utils.base.text import rk, ec, dc
 from sv_base.utils.tools.dir import list_files
 
 from .exception import ResourceException
@@ -28,7 +28,7 @@ def dump_resource_data(resource_data):
     }
 
     data_str = json.dumps(data, ensure_ascii=False)
-    data_str = zlib.compress(data_str)
+    data_str = zlib.compress(ec(data_str))
     data_str = base64.b64encode(data_str)
     return data_str
 
@@ -41,7 +41,7 @@ def load_resource_data(data_str):
     """
     data_str = base64.b64decode(data_str)
     data_str = zlib.decompress(data_str)
-    data = json.loads(data_str)
+    data = json.loads(dc(data_str))
     return data
 
 
@@ -89,7 +89,7 @@ class ResourceHandler(object):
         """
         data = Dumper(root_objs).dumps(tmp_dir)
         data_str = self.dump_resource_data(data)
-        with open(os.path.join(tmp_dir, self.data_file_name), 'w') as data_file:
+        with open(os.path.join(tmp_dir, self.data_file_name), 'wb') as data_file:
             data_file.write(data_str)
 
         return data_str

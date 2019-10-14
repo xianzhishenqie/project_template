@@ -127,11 +127,16 @@ class CacheModelMixin:
                 try:
                     c = import_string(c)
                 except Exception:
-                    continue
-            cache_view_name = _generate_cache_view_name(c)
-            cache = CacheProduct(cache_view_name)
-            cache.reset()
+                    pass
 
+            if isinstance(c, str):
+                cache = CacheProduct(c)
+            else:
+                cache_view_name = _generate_cache_view_name(c)
+                cache = CacheProduct(cache_view_name)
+
+            cache.reset()
+            
     def paginate_queryset_flag(self, queryset):
         """判断是否需要进行查询
 
@@ -241,7 +246,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
     批量删除数据混入类
     """
     def perform_destroy(self, instance):
-        """删除单挑数据
+        """删除单条数据
 
         :param instance: 数据实例
         """
@@ -249,7 +254,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
             self.clear_cache()
 
     def sub_perform_destroy(self, instance):
-        """删除单挑数据具体实现
+        """删除单条数据具体实现
 
         :param instance: 数据实例
         """
