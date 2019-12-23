@@ -1,1 +1,1 @@
-RESOURCE_TMP_DIR = '/tmp/cr_resource'
+RESOURCE_TMP_DIR = '/tmp/sv_resource'

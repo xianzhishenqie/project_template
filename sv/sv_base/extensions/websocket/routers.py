@@ -11,9 +11,7 @@ def get_default_router(websocket_classes):
     """
     routers = []
     for websocket_class in websocket_classes:
-        names = re.findall(r'[A-Z][a-z]+', websocket_class.__name__)
-        names = [s.lower() for s in names[:-1]]
-        name = '_'.join(names)
+        name = get_websocket_router_name(websocket_class)
         router = url(r'{}/'.format(name), websocket_class)
         routers.append(router)
     return routers
@@ -27,3 +25,22 @@ def ws_path(websocket_classes):
     """
     routers = get_default_router(websocket_classes)
     return routers
+
+
+def get_websocket_router_name(websocket):
+    """
+    获取websocket路由名称信息
+    :param websocket: websocket
+    :return: 路由名称信息
+    """
+    if hasattr(websocket, 'router_name'):
+        if callable(websocket.router_name):
+            name = websocket.router_name()
+        else:
+            name = websocket.router_name
+    else:
+        names = re.findall(r'[A-Z][a-z]+', websocket.__name__)
+        names = [s.lower() for s in names[:-1]]
+        name = '_'.join(names)
+
+    return name

@@ -17,9 +17,9 @@ yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel r
 yum -y install libffi-devel
 cd /tmp/
 mkdir /usr/local/python3
-wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tar.xz
-tar -xvJf  Python-3.7.4.tar.xz
-cd Python-3.7.4
+wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz
+tar -xvJf  Python-3.7.5.tar.xz
+cd Python-3.7.5
 ./configure --prefix=/usr/local/python3 --enable-optimizations
 make && make install
 
@@ -49,9 +49,9 @@ source /etc/profile
 
 
 cd /tmp
-wget http://nginx.org/download/nginx-1.17.2.tar.gz
-tar zxvf nginx-1.17.2.tar.gz
-cd nginx-1.17.2
+wget http://nginx.org/download/nginx-1.17.5.tar.gz
+tar zxvf nginx-1.17.5.tar.gz
+cd nginx-1.17.5
 ./configure --prefix=/usr/local/nginx --with-stream --with-http_ssl_module
 make
 make install

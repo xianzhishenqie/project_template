@@ -2,6 +2,8 @@ import logging
 import sys
 import traceback
 
+from enum import Enum
+
 from .trans import Trans as _
 from .message import MessageMeta, generate_message_code
 
@@ -51,7 +53,6 @@ def stack_error(auto_log=True):
         logger.error(message)
 
     return message
-
 
 
 class Error(Enum, metaclass=ErrorMeta):

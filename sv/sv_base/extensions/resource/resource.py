@@ -9,9 +9,7 @@ from sv_base.utils.base.text import md5
 from .exception import ResourceException
 from .meta import ResolveConflictType, RelationType, convert_string_fields, file_fields, try_import
 
-
 logger = logging.getLogger(__name__)
-
 
 index_key = '_index'
 
@@ -328,7 +326,7 @@ class DataResource:
             return
 
         self.data = data
-        self.model = ploads(str(self.p_model))
+        self.model = ploads(self.p_model)
 
         # 初始化对象关联属性
         self.root_own = self.model._resource_meta.root_own
@@ -374,7 +372,7 @@ class DataResource:
         """
         index = data[index_key]
         p_model = index['model']
-        return ploads(str(p_model))
+        return ploads(p_model)
 
     def load_data(self):
         """载入数据，转换问数据实例

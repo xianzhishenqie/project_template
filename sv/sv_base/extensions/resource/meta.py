@@ -174,7 +174,7 @@ class DataOption:
 
         # 字段选项 key资源字段名称 value获取/设置该资源的方法
         self.field_options = {}
-        for relation_type in RelationType.__members__.values():
+        for relation_type in RelationType.values():
             field_options = {}
             if relation_type in options:
                 for field_name, field_option in options[relation_type].items():
@@ -197,7 +197,7 @@ class DataOption:
 
         :return: bool
         """
-        for relation_type in RelationType.__members__.values():
+        for relation_type in RelationType.values():
             if getattr(self, relation_type, None):
                 return True
         return False
@@ -209,7 +209,7 @@ class DataOption:
         :return: 字段对应的关联资源
         """
         related = {}
-        for relation_type in RelationType.__members__.values():
+        for relation_type in RelationType.values():
             is_orm_related = relation_type in (RelationType.TO_ONE.value, RelationType.TO_MANY.value)
             for field_name, field_option in getattr(self, relation_type).items():
                 res = field_option.get(obj)

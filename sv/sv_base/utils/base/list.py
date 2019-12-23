@@ -88,7 +88,8 @@ def sort(data, key=None, seq=None, reverse=False):
     """
     key = key or (lambda x: x)
     if seq:
-        sort_key = lambda x: find(seq, key(x))
+        def sort_key(x):
+            return find(seq, key(x))
     else:
         sort_key = key
 
@@ -101,5 +102,5 @@ def find(seq, val):
 
     try:
         return seq.index(val)
-    except:
+    except Exception:
         return -1

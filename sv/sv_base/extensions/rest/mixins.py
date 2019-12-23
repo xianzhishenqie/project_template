@@ -122,6 +122,7 @@ class CacheModelMixin:
     def clear_cls_cache(cls):
         if not isinstance(cls, (list, tuple)):
             cls = [cls]
+
         for c in cls:
             if isinstance(c, str):
                 try:
@@ -136,7 +137,7 @@ class CacheModelMixin:
                 cache = CacheProduct(cache_view_name)
 
             cache.reset()
-            
+
     def paginate_queryset_flag(self, queryset):
         """判断是否需要进行查询
 

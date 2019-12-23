@@ -114,7 +114,6 @@ class Trans:
         else:
             deserialized_params = params
 
-
         content = Trans(
             *content.get('gettext_args', ()),
             gettext_func=gettext_func,

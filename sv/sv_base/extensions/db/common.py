@@ -13,6 +13,18 @@ def close_old_connections():
         conn.close_if_unusable_or_obsolete()
 
 
+def _get_obj_key(func, pk_or_obj, model=None):
+    if isinstance(pk_or_obj, Model):
+        key = None
+    else:
+        if not model:
+            return None
+
+        key = "__name__%s_model_%s" % (pk_or_obj, model)
+
+    return key
+
+
 def get_obj(pk_or_obj, model=None):
     """根据主键或对象本身获取model对象
 
@@ -28,7 +40,7 @@ def get_obj(pk_or_obj, model=None):
     else:
         if not model:
             return None
-        
+
         obj = model.objects.get(pk=pk_or_obj)
 
     return obj
