@@ -42,7 +42,7 @@ pip3 install virtualenvwrapper
 cat <<"EOF" >> /etc/profile
 export PATH=/usr/local/python3/bin/:$PATH
 export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/python3/bin/python3
 source /usr/local/python3/bin/virtualenvwrapper.sh
 EOF
 source /etc/profile
