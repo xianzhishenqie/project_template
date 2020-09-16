@@ -1,16 +1,17 @@
 import os
+import logging
+import time
 
 from django.conf import settings
-from django.db import connections
 from django.db.models import Model
 
+from sv_base.utils.base.thread import async_exe
+from sv_base.utils.base.cache import CacheProduct, func_cache
+from sv_base.extensions.db.decorators import promise_db_connection
 
-def close_old_connections():
-    """清除未使用的和废弃的连接
+logger = logging.getLogger(__name__)
 
-    """
-    for conn in connections.all():
-        conn.close_if_unusable_or_obsolete()
+common_cache = CacheProduct("base_common_cache")
 
 
 def _get_obj_key(func, pk_or_obj, model=None):
@@ -25,6 +26,7 @@ def _get_obj_key(func, pk_or_obj, model=None):
     return key
 
 
+@func_cache(common_cache, key_func=_get_obj_key)
 def get_obj(pk_or_obj, model=None):
     """根据主键或对象本身获取model对象
 
@@ -73,3 +75,110 @@ def clear_nouse_field_file(using_queryset, file_field_name):
         file_path = os.path.join(file_dir, filename)
         os.remove(file_path)
         print('remove file: %s' % file_path)
+
+
+class BulkSaver:
+    """
+    延迟批量创建、更新，实时性要求不高的数据保存
+    """
+
+    def __init__(self, batch_size=1000, delay=0, create_failed=None, update_failed=None):
+        self.batch_size = batch_size
+        self.delay = delay
+        self.create_failed = create_failed
+        self.update_failed = update_failed
+
+        self.create_pool = {}
+        self.create_receiving = False
+
+        self.update_pool = {}
+        self.update_receiving = False
+
+    def create(self, objs, delay=None):
+        if not objs:
+            return
+
+        self._add_objs(objs, self.create_pool)
+
+        if self.create_receiving:
+            return
+
+        self.create_receiving = True
+
+        delay = delay if delay is not None else self.delay
+
+        def _create():
+            if delay:
+                time.sleep(delay)
+
+            creating_pool = self.create_pool
+            self.create_pool = {}
+            self.create_receiving = False
+            self._create(creating_pool)
+
+        if delay:
+            async_exe(_create)
+        else:
+            _create()
+
+    def update(self, objs, delay=None):
+        if not objs:
+            return
+
+        self._add_objs(objs, self.update_pool)
+
+        if self.update_receiving:
+            return
+
+        self.update_receiving = True
+
+        delay = delay if delay is not None else self.delay
+
+        def _update():
+            if delay:
+                time.sleep(delay)
+
+            updating_pool = self.update_pool
+            self.update_pool = {}
+            self.update_receiving = False
+            self._update(updating_pool)
+
+        if delay:
+            async_exe(_update)
+        else:
+            _update()
+
+    @promise_db_connection
+    def _create(self, pool):
+        for model, obj_mapping in pool.items():
+            objs = list(obj_mapping.values())
+            try:
+                model.objects.bulk_create(objs, batch_size=self.batch_size)
+            except Exception as e:
+                logger.error(f'bulk create {model.__name__} objs failed: {e}')
+                if self.create_failed:
+                    self.create_failed(model, objs, e)
+
+    @promise_db_connection
+    def _update(self, pool):
+        for model, obj_mapping in pool.items():
+            objs = list(obj_mapping.values())
+            fields = [field.name for field in model._meta.fields if not field.primary_key]
+            try:
+                model.objects.bulk_update(objs, fields=fields, batch_size=self.batch_size)
+            except Exception as e:
+                logger.error(f'bulk update {model.__name__} objs failed: {e}')
+                if self.update_failed:
+                    self.update_failed(model, objs, e)
+
+    def _add_objs(self, objs, pool):
+        if not objs:
+            return
+
+        if isinstance(objs, Model):
+            objs = [objs]
+
+        for obj in objs:
+            model = obj._meta.model
+            obj_key = f'{model.__name__}:{obj.pk}'
+            pool.setdefault(model, {})[obj_key] = obj

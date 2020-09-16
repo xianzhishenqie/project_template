@@ -31,6 +31,24 @@ class HttpClient(Session):
         """
         return self.post(url, **self._set_request_timeout(kwargs))
 
+    def mput(self, url, **kwargs):
+        """put请求
+
+        :param url: 请求url
+        :param kwargs: 请求参数
+        :return: 请求结果
+        """
+        return self.put(url, **self._set_request_timeout(kwargs))
+
+    def mpatch(self, url, **kwargs):
+        """patch请求
+
+        :param url: 请求url
+        :param kwargs: 请求参数
+        :return: 请求结果
+        """
+        return self.patch(url, **self._set_request_timeout(kwargs))
+
     def mget(self, url, **kwargs):
         """get请求
 

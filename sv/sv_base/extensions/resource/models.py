@@ -28,12 +28,25 @@ class ResourceBase(ModelBase):
 
 class ResourceModel(models.Model):
     """
-    model 资源表类, 默认添加resource_id字段
+    model 资源表类, 默认添加resource_id唯一字段
     """
 
     __metaclass__ = ResourceBase
 
-    resource_id = models.CharField(max_length=64, default=rk)
+    resource_id = models.CharField(max_length=64, default=rk, unique=True)
+
+    class Meta:
+        abstract = True
+
+
+class PrimaryResourceModel(models.Model):
+    """
+    model 资源表类, 默认添加resource_id主键字段, 影响部分效率
+    """
+
+    __metaclass__ = ResourceBase
+
+    resource_id = models.CharField(max_length=64, default=rk, primary_key=True)
 
     class Meta:
         abstract = True

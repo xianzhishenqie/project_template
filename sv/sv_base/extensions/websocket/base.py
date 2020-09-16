@@ -1,4 +1,4 @@
-from asgiref.sync import async_to_sync
+import asyncio
 
 from channels.layers import get_channel_layer
 from channels.generic.websocket import JsonWebsocketConsumer
@@ -6,11 +6,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from sv_base.utils.base.task import SyncTaskPool
 
 
-class Websocket(JsonWebsocketConsumer):
-    """
-    websocket类, 添加自动组管理
-    """
-
+class WebsocketMixin:
     sync_task_pool = SyncTaskPool()
 
     def get_groups(self):
@@ -52,13 +48,6 @@ class Websocket(JsonWebsocketConsumer):
         """
         return get_channel_layer(cls.channel_layer_alias)
 
-    def group_message(self, message):
-        """组消息处理
-
-        :param message: 消息内容
-        """
-        self.send_json(message["content"], close=message["close"])
-
     @classmethod
     def group_send(cls, group, content, close=False):
         """组发送消息
@@ -68,13 +57,11 @@ class Websocket(JsonWebsocketConsumer):
         :param close: 是否关闭连接
         """
         channel_layer = cls.get_channel_layer()
-        group_send = async_to_sync(channel_layer.group_send)
-        group_name = cls.get_group_name(group)
-        group_send(group_name, {
+        asyncio.run(channel_layer.group_send(cls.get_group_name(group), {
             'type': 'group.message',
             'content': content,
             'close': close,
-        })
+        }))
 
     @classmethod
     def group_send_task(cls, group, content, close=False):
@@ -84,6 +71,25 @@ class Websocket(JsonWebsocketConsumer):
             'close': close,
         })
 
+    def group_message(self, message):
+        """组消息处理
+
+        :param message: 消息内容
+        """
+        self.send(text_data=message["content"], close=message["close"])
+
     def websocket_connect(self, message):
         self.groups = self.get_group_names()
         super().websocket_connect(message)
+
+
+class Websocket(WebsocketMixin, JsonWebsocketConsumer):
+    """
+    websocket类, 添加自动组管理
+    """
+    def group_message(self, message):
+        """组消息处理
+
+        :param message: 消息内容
+        """
+        self.send_json(message["content"], close=message["close"])

@@ -1,6 +1,10 @@
 import enum
 
 from sv_base.utils.base.type import NameValue, NameInt, NameStr
+from sv_base.extensions.db.fields import RemoteFileField
+
+
+STATUS_DELETED = 0
 
 
 class Choice(enum.Enum):
@@ -12,8 +16,8 @@ class Choice(enum.Enum):
         items = []
         for key, value in cls.__members__.items():
             val = value.value
-            if isinstance(val, NameValue):
-                items.append((val.value, val.name))
+            if isinstance(value, NameValue):
+                items.append((value.value, value.name))
             else:
                 items.append((val, key))
 
@@ -37,3 +41,12 @@ class IntChoice(NameInt, Choice):
 
 class StrChoice(NameStr, Choice):
     pass
+
+
+__all__ = [
+    'STATUS_DELETED',
+    'Choice',
+    'IntChoice',
+    'StrChoice',
+    'RemoteFileField',
+]

@@ -58,3 +58,6 @@ msgstr "level"
 
 msgid "x_log_content"
 msgstr "content"
+
+msgid "x_remote_file"
+msgstr "Remote file"

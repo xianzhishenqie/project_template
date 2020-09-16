@@ -1,6 +1,6 @@
 import functools
 
-from .common import close_old_connections
+from django.db import close_old_connections
 
 
 def promise_db_connection(func):

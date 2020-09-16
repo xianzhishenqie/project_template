@@ -2,6 +2,8 @@ import functools
 
 from django.core.cache import cache
 
+from sv_base.utils.base.text import md5
+
 
 def sync_func(key_func, timeout=1, exit_func=None):
     """
@@ -25,3 +27,17 @@ def sync_func(key_func, timeout=1, exit_func=None):
         return _wrapper
 
     return wrapper
+
+
+def get_func_key(func):
+    """
+    获取函数识别键，顶层函数模块名区分，内部函数id区分
+    :param func: 函数
+    :return: 函数识别键
+    """
+    func_name = func.__qualname__
+    complete_func_name = f'{func.__module__}.{func_name}'
+    if '<locals>' in func_name.split('.'):
+        complete_func_name = f'{complete_func_name}-{id(func)}'
+
+    return md5(complete_func_name)

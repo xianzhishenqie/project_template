@@ -1,6 +1,9 @@
 import re
-
+import uuid
 import psutil
+
+# 当前进程虚拟id
+cid = str(uuid.uuid4())
 
 
 def get_pid(name):

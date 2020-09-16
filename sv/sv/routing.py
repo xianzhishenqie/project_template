@@ -9,7 +9,7 @@ config = {}
 websocket_routers = get_sv_routers()
 if websocket_routers:
     config['websocket'] = AuthMiddlewareStack(
-        URLRouter([url(r'^ws/', URLRouter(get_sv_routers()))])
+        URLRouter([url(r'^ws/', URLRouter(websocket_routers))])
     )
 
 application = ProtocolTypeRouter(config)

@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.conf import settings
 from django.db.models.sql.datastructures import EmptyResultSet
@@ -14,7 +15,34 @@ from sv_base.extensions.rest.pagination import VueTablePagination, CacheVueTable
 from sv_base.extensions.rest.request import RequestData
 
 
-class SVMixin:
+logger = logging.getLogger(__name__)
+
+
+class BaseMixin(type):
+    """
+    通用元类，执行额外配置方法
+    """
+
+    def __new__(mcs, name, bases, attrs):
+        # 读取sv配置方法
+        views_define_funcs = getattr(settings, 'VIEWSET_DEFINE_FUNCS', None)
+
+        if views_define_funcs:
+            for fun in views_define_funcs:
+                try:
+                    fun = import_string(fun)
+                except Exception as e:
+                    logger.error(f'import error: {e}')
+                    continue
+
+                mcs, name, bases, attrs = fun(mcs, name, bases, attrs)
+
+        new_class = super().__new__(mcs, name, bases, attrs)
+
+        return new_class
+
+
+class SVMixin(metaclass=BaseMixin):
     """
     项目viewset公共继承类， 添加了请求字段过滤，合法数据过滤功能
     """
@@ -246,6 +274,9 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
     """
     批量删除数据混入类
     """
+    key_field = 'id'
+    key_type = int
+
     def perform_destroy(self, instance):
         """删除单条数据
 
@@ -270,11 +301,14 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
         :param request: 请求对象
         :return: 响应对象
         """
-        ids = self.shift_data.getlist('ids', int)
-        if not ids:
+        values = self.shift_data.getlist('ids', self.key_type)
+
+        if not values:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        queryset = self.queryset.filter(id__in=ids)
+        key = f'{self.key_field}__in'
+        queryset = self.queryset.filter(**{key: values})
+
         if self.perform_batch_destroy(queryset) and hasattr(self, 'clear_cache'):
             self.clear_cache()
 
@@ -295,6 +329,8 @@ class BatchSetModelMixin:
     批量设置字段值混入类
     """
     batch_set_fields = {}
+    key_field = 'id'
+    key_type = int
 
     @action(methods=['patch'], detail=False)
     def batch_set(self, request):
@@ -303,8 +339,10 @@ class BatchSetModelMixin:
         :param request: 请求对象
         :return: 响应对象
         """
-        ids = self.shift_data.getlist('ids', int)
-        if not ids:
+
+        values = self.shift_data.getlist('ids', self.key_type)
+
+        if not values:
             return Response(status=status.HTTP_200_OK)
 
         field = self.shift_data.get('field')
@@ -322,7 +360,9 @@ class BatchSetModelMixin:
         if value is None and not allow_null:
             raise exceptions.PermissionDenied()
 
-        queryset = self.queryset.filter(id__in=ids)
+        key = f'{self.key_field}__in'
+        queryset = self.queryset.filter(**{key: values})
+
         if self.perform_batch_set(queryset, field, value) and hasattr(self, 'clear_cache'):
             self.clear_cache()
 

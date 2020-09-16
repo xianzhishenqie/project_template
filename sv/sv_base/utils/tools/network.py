@@ -1,9 +1,9 @@
 import logging
 import socket
-import subprocess
 import time
 import random
-import re
+
+from ping3 import ping
 
 
 logger = logging.getLogger(__name__)
@@ -26,39 +26,6 @@ def cport(ip, port, timeout=2):
         else:
             result = True
     return result
-
-
-def ping(ip, timeout=2, count=2):
-    """检查ip是否ping通
-
-    :param ip: ip地址
-    :param timeout: 超时时间
-    :param count: 尝试次数
-    :return: 是否ping通
-    """
-    try:
-        res = subprocess.check_output('ping -c %s -w %s %s' % (count, timeout, ip), shell=True)
-    except Exception:
-        return False
-    if res.find(b'icmp_'):
-        return True
-    else:
-        return False
-
-
-def get_ping(ip):
-    """获取ip延迟时间
-
-    :param ip: ip地址
-    :return: 延迟时间 ms
-    """
-    try:
-        p = subprocess.getoutput('ping -c 1 {}'.format(ip))
-        pattern = re.compile(r"rtt min/avg/max/mdev = .*/(.*?)/.*/0.000 ms")
-        delay = int(float(pattern.findall(p)[0]))
-    except Exception:
-        delay = 0
-    return delay
 
 
 def probe(ip,
@@ -88,10 +55,12 @@ def probe(ip,
     if port:
         checker = cport
         args = (ip, port, timeout)
+        kwargs = {}
         dst_info = '%s:%s' % (ip, port)
     else:
         checker = ping
-        args = (ip, timeout)
+        args = (ip,)
+        kwargs = {'timeout': timeout}
         dst_info = ip
 
     if not ip:
@@ -104,7 +73,7 @@ def probe(ip,
     while True:
         enter_time = time.time()
         logger.info('[%s] %s check %s: %ss' % (log_prefix, checker.__name__, dst_info, all_time))
-        if checker(*args):
+        if checker(*args, **kwargs):
             logger.info('[%s] %s check %s ok' % (log_prefix, checker.__name__, dst_info))
             if callback:
                 callback()

@@ -5,11 +5,14 @@ rest framwork补丁
 from django.utils.encoding import force_text
 
 from rest_framework import exceptions
+from rest_framework.serializers import ModelSerializer
 from rest_framework.fields import FileField
 from rest_framework.settings import api_settings
 from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 
+from sv_base.extensions.db.fields import RemoteFileField as ModelRemoteFileField
 from sv_base.extensions.project.trans import Trans
+from sv_base.extensions.rest.fields import RemoteFileField
 
 
 def _get_error_details(data, default_code=None):
@@ -91,3 +94,4 @@ def monkey_patch():
     exceptions._get_error_details = _get_error_details
     exceptions._get_full_details = _get_full_details
     FileField.to_representation = file_field_to_representation
+    ModelSerializer.serializer_field_mapping[ModelRemoteFileField] = RemoteFileField

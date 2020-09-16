@@ -17,34 +17,51 @@ class DataFilter:
         self.strict = strict
         self._is_query_dict = isinstance(data, QueryDict)
 
-    def get(self, field_name, filter_param=str):
+    def get(self, field_name, filter_param=str, default=None):
         """获取有效字段值
 
         :param field_name: 字段名称
         :param filter_param: 过滤参数
+        :param default: 默认值
         :return: 字段值
         """
         data = self.data.get(field_name)
+
         if filter_param is bool:
             if data is None:
-                return data
+                return default
             else:
                 data = handle_bool_value(data)
-        return value_filter(data, filter_param, strict=self.strict)
 
-    def getlist(self, field_name, filter_param=str):
+        data = value_filter(data, filter_param, strict=self.strict)
+        if data is None:
+            return default
+
+        return data
+
+    def getlist(self, field_name, filter_param=str, default=None):
         """获取有效字段值
 
         :param field_name: 字段名称
         :param filter_param: 过滤参数
+        :param default: 默认值
         :return: 字段值
         """
         data = self.data.getlist(field_name) if self._is_query_dict else self.data.get(field_name)
+        if not data:
+            return [] if default is None else default
+
         if not isinstance(data, (list, tuple, set)):
             data = [data]
+
         if filter_param is bool:
             data = [handle_bool_value(item) for item in data]
-        return list_filter(data, filter_param, strict=self.strict) if data else []
+
+        data = list_filter(data, filter_param, strict=self.strict)
+        if not data:
+            return [] if default is None else default
+
+        return data
 
 
 class RequestData:
@@ -95,9 +112,9 @@ def handle_bool_value(value):
     :param value: 请求值
     """
     if isinstance(value, str):
-        if value == 'true':
+        if value.lower() == 'true':
             return True
-        elif value == 'false':
+        elif value.lower() == 'false':
             return False
 
         try:

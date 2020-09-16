@@ -58,3 +58,6 @@ msgstr "等级"
 
 msgid "x_log_content"
 msgstr "内容"
+
+msgid "x_remote_file"
+msgstr "远程文件"

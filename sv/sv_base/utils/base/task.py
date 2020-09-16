@@ -1,9 +1,8 @@
-import copy
-import enum
 import logging
 
-from sv_base.utils.base.thread import async_exe
+import enum
 
+from sv_base.utils.base.thread import async_exe
 
 logger = logging.getLogger(__name__)
 
@@ -62,24 +61,41 @@ class SyncTaskPool(TaskPool):
 
 class AsyncTaskPool(TaskPool):
 
+    def __init__(self, pool_size=None):
+        super().__init__()
+        self.pool_size = pool_size
+        self.progress_tasks = []
+        self.running = False
+
     def run(self, over_callback=None):
-        wait_tasks = [task for task in self.tasks if task.status == TaskStatus.WAIT]
+        if self.running:
+            return
+
         errors = []
+        if not self.tasks:
+            if over_callback:
+                over_callback(errors)
+            return
 
-        if wait_tasks:
-            for task in copy.copy(wait_tasks):
+        self.running = True
+        pool_size = self.pool_size if self.pool_size else len(self.tasks)
+        for i in range(pool_size):
+            async_exe(self._one_queue, (errors, over_callback))
 
-                def tmp(task=task):
-                    task.execute()
-                    if task.e:
-                        errors.append(task.e)
-                    wait_tasks.pop(wait_tasks.index(task))
+    def _next_task(self):
+        task = self.tasks.pop(0) if self.tasks else None
+        return task
 
-                    if not wait_tasks and over_callback:
-                        over_callback(errors)
+    def _one_queue(self, errors, over_callback):
+        while self.tasks:
+            task = self._next_task()
+            self.progress_tasks.append(task)
+            task.execute()
+            if task.e:
+                errors.append(task.e)
+            self.progress_tasks.remove(task)
 
-                async_exe(tmp)
-                self.tasks.pop(self.tasks.index(task))
-        else:
+        if self.running and not self.progress_tasks:
+            self.running = False
             if over_callback:
                 over_callback(errors)

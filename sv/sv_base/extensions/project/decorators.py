@@ -24,7 +24,7 @@ def _exit_perform_create(*args, **kwargs):
     """
     退出创建
     """
-    raise exceptions.PermissionDenied(Error.DUPLICATE_SUBMIT)
+    raise exceptions.ParseError(Error.DUPLICATE_SUBMIT)
 
 
 def sync_perform_create(fields=None):
@@ -36,4 +36,4 @@ def sync_perform_create(fields=None):
         serializer_key = _get_serializer_key(serializer, fields)
         return f'perform_create_key:{serializer_key}'
 
-    return sync_func(key_func, exit_func=_exit_perform_create)
+    return sync_func(key_func, timeout=3, exit_func=_exit_perform_create)

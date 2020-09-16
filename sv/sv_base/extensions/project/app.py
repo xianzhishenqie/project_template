@@ -1,3 +1,4 @@
+import inspect
 import logging
 
 from importlib import import_module
@@ -11,6 +12,7 @@ from channels.routing import URLRouter
 from sv_base.utils.base.thread import async_exe, async_exe_once
 from sv_base.extensions.rest.routers import rest_path
 from sv_base.extensions.websocket.routers import ws_path
+from sv_base.extensions.service.message import get_message_listener
 
 
 logger = logging.getLogger(__name__)
@@ -128,13 +130,13 @@ def get_sv_urls():
             if hasattr(urls_module, 'viewsets'):
                 urls_module.apiurlpatterns += rest_path(urls_module.viewsets)
 
-            path_name = settings.APP_PATH[app_name]
+            path_name = settings.SV_APP_PATH[app_name]
             if urls_module.urlpatterns:
                 patterns.append(
                     path(_get_sub_path(path_name), include((urls_module.urlpatterns, app_name)))
                 )
 
-            if urls_module.apipatterns:
+            if urls_module.apiurlpatterns:
                 apipatterns.append(
                     path(_get_sub_path(path_name), include((urls_module.apiurlpatterns, app_name)))
                 )
@@ -230,7 +232,7 @@ def get_sv_routers():
             if hasattr(routers_module, 'websockets'):
                 routers_module.routerpatterns.append(ws_path(routers_module.websockets))
 
-            path_name = settings.APP_PATH[app_name]
+            path_name = settings.SV_APP_PATH[app_name]
             patterns.append(
                 url(_get_sub_channel_pattern(path_name), URLRouter(routers_module.routerpatterns))
             )
@@ -244,6 +246,63 @@ def get_sv_routers():
             patterns.append(
                 url(_get_sub_channel_pattern(sub_module_path_name), URLRouter(sub_module_patterns))
             )
+
+    return patterns
+
+
+def get_app_subscribers(app_name):
+    """获取app消息订阅路由
+
+    :param app_name: app名称
+    :return: 子模块对应路由
+    """
+    patterns = []
+    for sub_module_name in settings.SUB_MODULES:
+        # 检查收集子模块的路由文件
+        subscribers_name = '{app_name}.{sub_module}.subscribers'.format(
+            app_name=app_name,
+            sub_module=sub_module_name,
+        )
+        try:
+            subscribers_module = import_module(subscribers_name)
+        except ImportError as e:
+            _handle_import_error(e, subscribers_name)
+        else:
+            for _, potential_subscriber in inspect.getmembers(subscribers_module, callable):
+                if hasattr(potential_subscriber, '_message_listener_key'):
+                    patterns.append(
+                        get_message_listener(potential_subscriber._message_listener_key, potential_subscriber,
+                                             potential_subscriber._message_listener_context_key)
+                    )
+
+    return patterns
+
+
+def get_sv_subscribers():
+    """获取项目消息订阅路由。
+
+    :return: 项目消息订阅路由列表
+    """
+    patterns = []
+    for app_name in settings.SV_APP_NAMES:
+        # 检查收集app根目录的路由
+        subscribers_name = '{app_name}.subscribers'.format(
+            app_name=app_name,
+        )
+        try:
+            subscribers_module = import_module(subscribers_name)
+        except ImportError as e:
+            _handle_import_error(e, subscribers_name)
+        else:
+            for _, potential_subscriber in inspect.getmembers(subscribers_module, callable):
+                if hasattr(potential_subscriber, '_message_listener_key'):
+                    patterns.append(
+                        get_message_listener(potential_subscriber._message_listener_key, potential_subscriber,
+                                             potential_subscriber._message_listener_context_key)
+                    )
+
+        # 收集子模块的路由
+        patterns.extend(get_app_subscribers(app_name))
 
     return patterns
 

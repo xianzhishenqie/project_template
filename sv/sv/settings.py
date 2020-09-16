@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+import datetime
 import os
 
 from django.utils.translation import ugettext_lazy as _
@@ -156,7 +156,7 @@ DEFAULT_CACHE_AGE = 300
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/1',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'PASSWORD': REDIS_PASS,
@@ -170,7 +170,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [f'redis://:{REDIS_PASS}@127.0.0.1:6379/0'],
+            'hosts': [f'redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0'],
             'prefix': 'sv',
             'expiry': 60 * 10,
             'capacity': 8192,
@@ -242,6 +242,12 @@ if DEBUG:
     REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].append('rest_framework.renderers.BrowsableAPIRenderer')
 
 
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(seconds=7),
+}
+
 SUB_MODULES = {
     'public': '',
     'cms': 'admin',
@@ -253,3 +259,13 @@ ENCODING = 'utf-8'
 MS = {}
 
 ENABLE_API_CACHE = True
+
+# nameko微服务框架配置
+NAMEKO_CONFIG = {
+    'default': {
+        'AMQP_URI': f'pyamqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:{RABBITMQ_PORT}',
+        'max_workers': NAMEKO_MAX_WORKERS,
+        'serializer': 'json',
+        'ACCEPT': ['json', 'pickle', 'yaml', 'msgpack'],
+    },
+}
