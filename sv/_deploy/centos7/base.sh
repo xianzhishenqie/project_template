@@ -17,9 +17,9 @@ yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel r
 yum -y install libffi-devel
 cd /tmp/
 mkdir /usr/local/python3
-wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz
-tar -xvJf  Python-3.7.5.tar.xz
-cd Python-3.7.5
+wget https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tgz
+tar -zxvf  Python-3.7.6.tgz
+cd Python-3.7.6
 ./configure --prefix=/usr/local/python3 --enable-optimizations
 make && make install
 
@@ -30,7 +30,7 @@ ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
 mkdir ~/.pip/
 cat <<EOF >> ~/.pip/pip.conf
 [global]
-index-url = http://mirrors.aliyun.com/pypi/simple/
+index-url = https://mirrors.aliyun.com/pypi/simple/
 
 [install]
 trusted-host=mirrors.aliyun.com
@@ -42,7 +42,7 @@ pip3 install virtualenvwrapper
 cat <<"EOF" >> /etc/profile
 export PATH=/usr/local/python3/bin/:$PATH
 export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/python3/bin/python3
 source /usr/local/python3/bin/virtualenvwrapper.sh
 EOF
 source /etc/profile
