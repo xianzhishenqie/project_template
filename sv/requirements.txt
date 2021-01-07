@@ -14,7 +14,7 @@ requests==2.21.0
 paramiko==2.4.2
 qrcode==6.1
 qrtools==0.0.2
-lxml==4.3.3
+lxml==4.6.2
 pyminizip==0.2.4
 psutil==5.6.1
 # djangorestframework optional
